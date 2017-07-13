@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- main activity -->
+    <dimen name="location_padding">8dp</dimen>
+    <dimen name="location_margin">8dp</dimen>
+    <dimen name="location_textsize">16sp</dimen>
+
+    <dimen name="corner_width">2dp</dimen>
+
+</resources>

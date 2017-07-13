@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Let\'s Dine</string>
+    <string name="action_favorite">Mark Favorite</string>
+
+    <string name="location_placeholder">Current Location</string>
+    <string name="Places_API_KEY">AIzaSyCRZihCfgg-_x5XZPOwdPO_sCiFfioZ90w</string>
+</resources>
