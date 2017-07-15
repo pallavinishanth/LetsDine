@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -49,12 +50,6 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Retrieve location and camera position from saved instance state.
-        if (savedInstanceState != null) {
-            location = savedInstanceState.getParcelable(KEY_LOCATION);
-
-        }
 
         setContentView(R.layout.activity_main);
 
@@ -107,8 +102,13 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
             public void onClick(View view) {
 
                 try {
+
+                    AutocompleteFilter locationFilter = new AutocompleteFilter.Builder()
+                            .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+                            .build();
+
                     Intent intent = new PlaceAutocomplete.IntentBuilder
-                            (PlaceAutocomplete.MODE_FULLSCREEN)
+                            (PlaceAutocomplete.MODE_FULLSCREEN).setFilter(locationFilter)
                             .build(MainActivity.this);
                     startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
                 } catch (GooglePlayServicesRepairableException |
@@ -117,6 +117,12 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 }
             }
         });
+
+        // Retrieve location from saved instance state.
+        if (savedInstanceState != null) {
+            LocTextView.setText(savedInstanceState.getString(KEY_LOCATION));
+            Log.d(LOG_TAG, "After rotating" + LocTextView.getText().toString());
+        }
     }
 
     @Override
@@ -157,12 +163,15 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     }
 
     /**
-     * Saves the state of the map when the activity is paused.
+     * Saves the location when the activity is paused.
      */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-            outState.putParcelable(KEY_LOCATION, location);
-            super.onSaveInstanceState(outState);
+
+        Log.d(LOG_TAG, "Before rotating" + LocTextView.getText().toString());
+
+        outState.putString(KEY_LOCATION, LocTextView.getText().toString());
+        super.onSaveInstanceState(outState);
 
     }
 

@@ -8,4 +8,9 @@
 
     <dimen name="corner_width">2dp</dimen>
 
+    <dimen name="res_card_view_padding">8dp</dimen>
+    <dimen name="image_margin">8dp</dimen>
+
+    <dimen name="res_name_textsize">30sp</dimen>
+
 </resources>

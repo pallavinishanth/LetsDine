@@ -23,7 +23,8 @@
             android:padding="@dimen/location_padding"
             android:layout_margin="@dimen/location_margin"
             android:layout_centerHorizontal="true"
-            android:textAlignment="center"/>
+            android:textAlignment="center"
+            android:focusableInTouchMode="true"/>
 
     <FrameLayout
         android:layout_width="match_parent"
