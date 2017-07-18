@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,10 +28,20 @@ import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.pallavinishanth.android.letsdine.Network.ResRetrofitAPI;
+import com.pallavinishanth.android.letsdine.Network.ResSearchJSON;
+import com.pallavinishanth.android.letsdine.Network.Results;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.GsonConverterFactory;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 public class MainActivity extends AppCompatActivity implements PlaceSelectionListener {
 
@@ -45,6 +57,15 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     String cityname;
     private Location location;
     String state;
+
+    final String RES_DATA_API = "https://maps.googleapis.com/maps/";
+    private int RADIUS = 10000;
+    private static List<Results> resJSONdata = new ArrayList<>();
+
+    private RecyclerView resRecyclerView;
+    private RecyclerView.LayoutManager resLayoutManager;
+    private ResDataAdapter resDataAdapter;
+    static int res_data_count;
 
 
     @Override
@@ -117,6 +138,14 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 }
             }
         });
+
+        retrofit_response(location.getLatitude() +"," +location.getLongitude());
+
+        resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        resRecyclerView.setHasFixedSize(true);
+
+        resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        resRecyclerView.setLayoutManager(resLayoutManager);
 
         // Retrieve location from saved instance state.
         if (savedInstanceState != null) {
@@ -204,5 +233,45 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    private void retrofit_response(String location){
+
+        Retrofit resRetrofit = new Retrofit.Builder()
+                .baseUrl(RES_DATA_API)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ResRetrofitAPI retrofitAPI = resRetrofit.create(ResRetrofitAPI.class);
+
+        Call<ResSearchJSON> call = retrofitAPI.getNearbyRestaurants(location, RADIUS,
+                BuildConfig.GOOGLE_PLACES_API_KEY);
+
+        call.enqueue(new Callback<ResSearchJSON>() {
+            @Override
+            public void onResponse(Response<ResSearchJSON> response, Retrofit retrofit) {
+
+                Log.v(LOG_TAG, "Restaurant search Response is " + response.body().getStatus());
+
+                resJSONdata = response.body().getResults();
+                res_data_count = resJSONdata.size();
+
+                for(Results result: resJSONdata){
+                    Log.v(LOG_TAG, "Nearby Restaurant Name is " + result.getName());
+                    Log.v(LOG_TAG, "Nearby Restaurant price level " + result.getPriceLevel());
+
+                }
+
+                resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
+                resRecyclerView.setAdapter(resDataAdapter);
+
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+        });
+
     }
 }
