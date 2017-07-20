@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -73,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     private RecyclerView.LayoutManager resLayoutManager;
     private ResDataAdapter resDataAdapter;
     static int res_data_count;
+    ProgressBar progress_bar;
+    boolean progressBarIsShowing;
 
 
     @Override
@@ -87,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
         actionBar.setDisplayShowTitleEnabled(true);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        progress_bar = (ProgressBar)findViewById(R.id.progressBar);
 
         LocTextView = (TextView)findViewById(R.id.location);
 
@@ -154,13 +158,17 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
         });
 
 
-        if(current_loc==true)
-        retrofit_response(location.getLatitude() +"," +location.getLongitude());
+        if(current_loc==true) {
+            progress_bar.setVisibility(ProgressBar.VISIBLE);
+            progressBarIsShowing = true;
+            retrofit_response(location.getLatitude() + "," + location.getLongitude());
+        }
 
         // Retrieve location from saved instance state.
         if (savedInstanceState != null) {
             LocTextView.setText(savedInstanceState.getString(KEY_LOCATION));
             resJSONdata = savedInstanceState.getParcelableArrayList("RES_LIST");
+            progressBarIsShowing = savedInstanceState.getBoolean("progressBarIsShowing");
             Log.d(LOG_TAG, "After rotating" + LocTextView.getText().toString());
             Log.d(LOG_TAG, "After rotating" + resJSONdata.get(1).getName().toString());
         }
@@ -203,6 +211,8 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
         LatLng Sel_location = place.getLatLng();
 
         current_loc = false;
+        progress_bar.setVisibility(ProgressBar.VISIBLE);
+        progressBarIsShowing = true;
         retrofit_response(Sel_location.latitude +"," +Sel_location.longitude);
     }
 
@@ -225,6 +235,10 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
         outState.putString(KEY_LOCATION, LocTextView.getText().toString());
         outState.putParcelableArrayList("RES_LIST", resJSONdata);
+        if (progressBarIsShowing) {
+            outState.putBoolean("progressBarIsShowing", progressBarIsShowing);
+        }
+
         super.onSaveInstanceState(outState);
 
     }
@@ -286,6 +300,8 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                     Log.v(LOG_TAG, "Nearby Restaurant price level " + result.getPriceLevel());
 
                 }
+
+                progress_bar.setVisibility(ProgressBar.INVISIBLE);
 
                 resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
                 resRecyclerView.setAdapter(resDataAdapter);

@@ -199,8 +199,7 @@ public class Results implements Parcelable{
         icon = in.readString();
         id = in.readString();
         name = in.readString();
-        photos = new ArrayList<Photos>();
-        in.readList(photos, Photos.class.getClassLoader());
+        photos = in.readArrayList(null);
 
         //photos = (ArrayList<Photos>)in.readSerializable();
         place_id = in.readString();
