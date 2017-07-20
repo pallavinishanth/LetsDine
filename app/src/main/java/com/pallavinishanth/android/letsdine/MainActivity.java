@@ -10,9 +10,12 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +31,7 @@ import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.model.LatLng;
 import com.pallavinishanth.android.letsdine.Network.ResRetrofitAPI;
 import com.pallavinishanth.android.letsdine.Network.ResSearchJSON;
 import com.pallavinishanth.android.letsdine.Network.Results;
@@ -57,11 +61,14 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     String cityname;
     private Location location;
     String state;
+    static boolean current_loc = true;
 
     final String RES_DATA_API = "https://maps.googleapis.com/maps/";
     private int RADIUS = 10000;
-    private static List<Results> resJSONdata = new ArrayList<>();
+    private static ArrayList<Results> resJSONdata = new ArrayList<>();
 
+    private Toolbar mToolbar;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView resRecyclerView;
     private RecyclerView.LayoutManager resLayoutManager;
     private ResDataAdapter resDataAdapter;
@@ -73,6 +80,13 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        ActionBar actionBar=getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(true);
+
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
 
         LocTextView = (TextView)findViewById(R.id.location);
 
@@ -139,7 +153,17 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
             }
         });
 
+
+        if(current_loc==true)
         retrofit_response(location.getLatitude() +"," +location.getLongitude());
+
+        // Retrieve location from saved instance state.
+        if (savedInstanceState != null) {
+            LocTextView.setText(savedInstanceState.getString(KEY_LOCATION));
+            resJSONdata = savedInstanceState.getParcelableArrayList("RES_LIST");
+            Log.d(LOG_TAG, "After rotating" + LocTextView.getText().toString());
+            Log.d(LOG_TAG, "After rotating" + resJSONdata.get(1).getName().toString());
+        }
 
         resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         resRecyclerView.setHasFixedSize(true);
@@ -147,11 +171,8 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
         resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         resRecyclerView.setLayoutManager(resLayoutManager);
 
-        // Retrieve location from saved instance state.
-        if (savedInstanceState != null) {
-            LocTextView.setText(savedInstanceState.getString(KEY_LOCATION));
-            Log.d(LOG_TAG, "After rotating" + LocTextView.getText().toString());
-        }
+        resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
+        resRecyclerView.setAdapter(resDataAdapter);
     }
 
     @Override
@@ -179,7 +200,10 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
         Log.i(LOG_TAG, "Place Selected: " + place.getName());
 
         LocTextView.setText(place.getName());
+        LatLng Sel_location = place.getLatLng();
 
+        current_loc = false;
+        retrofit_response(Sel_location.latitude +"," +Sel_location.longitude);
     }
 
     @Override
@@ -200,6 +224,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
         Log.d(LOG_TAG, "Before rotating" + LocTextView.getText().toString());
 
         outState.putString(KEY_LOCATION, LocTextView.getText().toString());
+        outState.putParcelableArrayList("RES_LIST", resJSONdata);
         super.onSaveInstanceState(outState);
 
     }

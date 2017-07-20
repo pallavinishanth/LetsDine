@@ -1,5 +1,8 @@
 package com.pallavinishanth.android.letsdine.Network;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,14 +10,14 @@ import java.util.List;
  * Created by PallaviNishanth on 7/14/17.
  */
 
-public class Results {
+public class Results implements Parcelable{
 
     private String icon;
     private String id;
     private Geometry geometry;
     private String name;
     private OpeningHours opening_hours;
-    private List<Photos> photos = new ArrayList<Photos>();
+    private ArrayList<Photos> photos = new ArrayList<Photos>();
     private String place_id;
     private String scope;
     private Integer price_level;
@@ -96,14 +99,14 @@ public class Results {
     /*
      * photos getter
      */
-    public List<Photos> getPhotos() {
+    public ArrayList<Photos> getPhotos() {
         return photos;
     }
 
     /*
      * photos setter
      */
-    public void setPhotos(List<Photos> photos) {
+    public void setPhotos(ArrayList<Photos> photos) {
         this.photos = photos;
     }
 
@@ -191,5 +194,54 @@ public class Results {
         this.vicinity = vicinity;
     }
 
+    private Results(Parcel in){
 
+        icon = in.readString();
+        id = in.readString();
+        name = in.readString();
+        photos = new ArrayList<Photos>();
+        in.readList(photos, Photos.class.getClassLoader());
+
+        //photos = (ArrayList<Photos>)in.readSerializable();
+        place_id = in.readString();
+        scope = in.readString();
+        price_level = in.readInt();
+        rating = in.readDouble();
+        vicinity = in.readString();
+
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
+        parcel.writeString(icon);
+        parcel.writeString(id);
+        parcel.writeString(name);
+        parcel.writeList(photos);
+        parcel.writeString(place_id);
+        parcel.writeString(scope);
+        parcel.writeInt(price_level);
+        parcel.writeDouble(rating);
+        parcel.writeString(vicinity);
+
+
+    }
+
+    public static final Parcelable.Creator<Results> CREATOR = new Parcelable.Creator<Results>(){
+
+        @Override
+        public Results createFromParcel(Parcel parcel) {
+            return new Results(parcel);
+        }
+
+        @Override
+        public Results[] newArray(int i) {
+            return new Results[i];
+        }
+    };
 }

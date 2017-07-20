@@ -17,8 +17,8 @@
             android:padding="@dimen/res_card_view_padding">
 
             <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="@dimen/image_size"
+                android:layout_height="@dimen/image_size"
                 android:id="@+id/res_image"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentTop="true"
@@ -30,6 +30,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/res_name"
                 android:layout_toRightOf="@+id/res_image"
+                android:textColor="@color/black"
                 android:layout_alignParentTop="true"
                 android:textStyle="bold"
                 android:textSize="@dimen/res_name_textsize" />

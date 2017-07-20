@@ -10,7 +10,7 @@ import java.util.List;
 public class ResSearchJSON {
 
     private String status;
-    private List<Results> results = new ArrayList<Results>();
+    private ArrayList<Results> results = new ArrayList<Results>();
     private List<Object> html_attributions = new ArrayList<Object>();
     private String next_page_token;
 
@@ -31,14 +31,14 @@ public class ResSearchJSON {
     /*
      * results getter
      */
-    public List<Results> getResults() {
+    public ArrayList<Results> getResults() {
         return results;
     }
 
     /*
      * results setter
      */
-    public void setResults(List<Results> results) {
+    public void setResults(ArrayList<Results> results) {
         this.results = results;
     }
 
