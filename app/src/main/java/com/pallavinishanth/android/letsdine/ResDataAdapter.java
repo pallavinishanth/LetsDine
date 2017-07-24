@@ -23,6 +23,16 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
 
     List<Results> res_results;
 
+    public interface OnItemClickListener {
+        void onItemClick(View itemView, int position);
+    }
+
+    private static OnItemClickListener listener;
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
 
     public ResDataAdapter(Context context, List<Results> resresults){
 
@@ -45,7 +55,11 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
     @Override
     public void onBindViewHolder(ResDataAdapter.ViewHolder holder, int position) {
 
-        Glide.with(rContext).load(res_results.get(position).getIcon()).into(holder.rImageView);
+        //Glide.with(rContext).load(res_results.get(position).getIcon()).into(holder.rImageView);
+
+        Glide.with(rContext).load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="
+                +res_results.get(position).getPhotos().get(0).getPhotoReference()
+                +"&key=" + BuildConfig.GOOGLE_PLACES_API_KEY).centerCrop().into(holder.rImageView);
 
 
         holder.res_name_view.setText(res_results.get(position).getName());
@@ -112,6 +126,18 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
             res_address_view = (TextView) view.findViewById(R.id.res_vicinity);
             res_pricelevel_view = (TextView) view.findViewById(R.id.res_price);
             res_rating_view = (TextView) view.findViewById(R.id.res_rating);
+
+            view.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View view) {
+
+                    int position = getAdapterPosition();
+                    if(position!= RecyclerView.NO_POSITION) {
+                        listener.onItemClick(view, position);
+                    }
+                }
+            });
         }
     }
 }

@@ -181,6 +181,21 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
         resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
         resRecyclerView.setAdapter(resDataAdapter);
+
+        resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(View itemView, int position) {
+
+                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
+
+                Results res_results_card = resJSONdata.get(position);
+
+                Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                i.putExtra(DetailActivity.EXTRA_NAME, res_results_card);
+                startActivity(i);
+            }
+        });
     }
 
     @Override
@@ -310,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
             @Override
             public void onFailure(Throwable t) {
-
+                Log.v(LOG_TAG, "On Failure" + t.toString());
             }
         });
 

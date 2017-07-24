@@ -1,5 +1,8 @@
 package com.pallavinishanth.android.letsdine.Network;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +10,7 @@ import java.util.List;
  * Created by PallaviNishanth on 7/14/17.
  */
 
-public class Photos {
+public class Photos implements Parcelable {
 
     private String photo_reference;
     private Integer height;
@@ -69,4 +72,41 @@ public class Photos {
     public void setHtmlAttributions(List<String> htmlAttributions) {
         this.htmlAttributions = htmlAttributions;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    private Photos(Parcel in){
+        photo_reference = in.readString();
+        height = in.readInt();
+        width = in.readInt();
+        htmlAttributions = new ArrayList<String>();
+        in.readStringList(htmlAttributions);
+
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
+        parcel.writeString(photo_reference);
+        parcel.writeInt(height);
+        parcel.writeInt(width);
+        parcel.writeStringList(htmlAttributions);
+
+    }
+
+    public static final Parcelable.Creator<Photos> CREATOR = new Parcelable.Creator<Photos>(){
+
+        @Override
+        public Photos createFromParcel(Parcel parcel) {
+            return new Photos(parcel);
+        }
+
+        @Override
+        public Photos[] newArray(int i) {
+            return new Photos[i];
+        }
+    };
 }

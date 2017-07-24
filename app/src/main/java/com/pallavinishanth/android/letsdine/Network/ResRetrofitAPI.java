@@ -16,4 +16,5 @@ public interface ResRetrofitAPI {
     @GET("api/place/search/json?type=restaurant")
     Call<ResSearchJSON> getNearbyRestaurants(@Query("location") String location,
                                         @Query("radius") int radius, @Query("key") String API_KEY);
+
 }

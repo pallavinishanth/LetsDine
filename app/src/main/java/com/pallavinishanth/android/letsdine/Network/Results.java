@@ -199,9 +199,9 @@ public class Results implements Parcelable{
         icon = in.readString();
         id = in.readString();
         name = in.readString();
-        photos = in.readArrayList(null);
+        photos = new ArrayList<Photos>();
 
-        //photos = (ArrayList<Photos>)in.readSerializable();
+        in.readTypedList(photos, Photos.CREATOR);
         place_id = in.readString();
         scope = in.readString();
         price_level = in.readInt();
@@ -224,8 +224,13 @@ public class Results implements Parcelable{
         parcel.writeList(photos);
         parcel.writeString(place_id);
         parcel.writeString(scope);
+
+        if(price_level!=null)
         parcel.writeInt(price_level);
+
+        if(rating!=null)
         parcel.writeDouble(rating);
+
         parcel.writeString(vicinity);
 
 
