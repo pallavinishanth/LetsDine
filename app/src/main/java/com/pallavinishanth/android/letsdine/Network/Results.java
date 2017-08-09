@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by PallaviNishanth on 7/14/17.
@@ -22,7 +21,7 @@ public class Results implements Parcelable{
     private String scope;
     private Integer price_level;
     private Double rating;
-    private List<String> types = new ArrayList<String>();
+    private ArrayList<String> types = new ArrayList<String>();
     private String vicinity;
 
 
@@ -169,14 +168,14 @@ public class Results implements Parcelable{
     /*
      * types getter
      */
-    public List<String> getTypes() {
+    public ArrayList<String> getTypes() {
         return types;
     }
 
     /*
      * types setter
      */
-    public void setTypes(List<String> types) {
+    public void setTypes(ArrayList<String> types) {
         this.types = types;
     }
 

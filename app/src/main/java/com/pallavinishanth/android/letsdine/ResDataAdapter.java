@@ -1,6 +1,7 @@
 package com.pallavinishanth.android.letsdine;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,15 +56,46 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
     @Override
     public void onBindViewHolder(ResDataAdapter.ViewHolder holder, int position) {
 
-        //Glide.with(rContext).load(res_results.get(position).getIcon()).into(holder.rImageView);
 
-        Glide.with(rContext).load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="
-                +res_results.get(position).getPhotos().get(0).getPhotoReference()
-                +"&key=" + BuildConfig.GOOGLE_PLACES_API_KEY).centerCrop().into(holder.rImageView);
+        if(res_results.get(position).getName()!=null) {
+
+            holder.res_name_view.setText(res_results.get(position).getName());
+        }else{
+            holder.res_name_view.setText("Name not Found");
+        }
+
+        if(res_results.get(position).getVicinity()!=null) {
+
+            holder.res_address_view.setText(res_results.get(position).getVicinity());
+        }else{
+            holder.res_address_view.setText("Address not Found");
+        }
+
+        if(res_results.get(position).getOpeningHours()!=null) {
+
+            if (res_results.get(position).getOpeningHours().getOpenNow() == true) {
+
+                holder.res_opening_hours.setText("Open Now");
+                holder.res_opening_hours.setTextColor(Color.parseColor("#4CAF50"));
+
+            } else {
+
+                holder.res_opening_hours.setText("Closed Now");
+                holder.res_opening_hours.setTextColor(Color.RED);
+            }
+        }
 
 
-        holder.res_name_view.setText(res_results.get(position).getName());
-        holder.res_address_view.setText(res_results.get(position).getVicinity());
+        if(res_results.get(position).getPhotos()==null){
+
+            Glide.with(rContext).load(res_results.get(position).getIcon()).into(holder.rImageView);
+        }else{
+
+
+            Glide.with(rContext).load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="
+                    +res_results.get(position).getPhotos().get(0).getPhotoReference()
+                    +"&key=" + BuildConfig.GOOGLE_PLACES_API_KEY).centerCrop().into(holder.rImageView);
+        }
 
         if(res_results.get(position).getRating() == null){
 
@@ -117,6 +149,7 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
         TextView res_address_view;
         TextView res_pricelevel_view;
         TextView res_rating_view;
+        TextView res_opening_hours;
 
         public ViewHolder(final View view) {
             super(view);
@@ -126,6 +159,7 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
             res_address_view = (TextView) view.findViewById(R.id.res_vicinity);
             res_pricelevel_view = (TextView) view.findViewById(R.id.res_price);
             res_rating_view = (TextView) view.findViewById(R.id.res_rating);
+            res_opening_hours = (TextView) view.findViewById(R.id.res_opening_hours);
 
             view.setOnClickListener(new View.OnClickListener(){
 

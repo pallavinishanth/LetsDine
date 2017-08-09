@@ -5,10 +5,13 @@
     <string name="location_placeholder">Current Location</string>
     <string name="Places_API_KEY">AIzaSyCRZihCfgg-_x5XZPOwdPO_sCiFfioZ90w</string>
 
-    <string name="hours">HOURS :</string>
+    <string name="hours">HOURS</string>
+
+    <string name="Reviews">REVIEWS</string>
     <string name="address_map">ADDRESS AND MAP</string>
 
-    <string name="website_heading">LINKS</string>
+    <string name="website_heading">WEBSITE</string>
+    <string name="photos_heading">PHOTOS</string>
 
     <string name="res_detail_activity">RestaurantDetails</string>
 </resources>

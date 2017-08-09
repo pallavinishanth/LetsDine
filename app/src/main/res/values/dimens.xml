@@ -23,15 +23,21 @@
     <dimen name="expandedTitle_MarginStart">48dp</dimen>
     <dimen name="expandedTitle_MarginEnd">64dp</dimen>
 
-    <dimen name="hours_textsize">16sp</dimen>
+    <dimen name="detail_textsize">14sp</dimen>
+    <dimen name="heading_textsize">16sp</dimen>
 
     <dimen name="hours_margin">8dp</dimen>
     <dimen name="address_margin">8dp</dimen>
 
     <dimen name="map_image_size">60dp</dimen>
 
-    <dimen name="address_size">260dp</dimen>
+    <dimen name="phone_icon_size">30dp</dimen>
+
+    <dimen name="address_size">220dp</dimen>
 
     <dimen name="photo_padding">8dp</dimen>
+    <dimen name="review_padding">8dp</dimen>
+
+    <dimen name="photo_size">200dp</dimen>
 
 </resources>

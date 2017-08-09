@@ -33,6 +33,7 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.model.LatLng;
+import com.pallavinishanth.android.letsdine.Network.Photos;
 import com.pallavinishanth.android.letsdine.Network.ResRetrofitAPI;
 import com.pallavinishanth.android.letsdine.Network.ResSearchJSON;
 import com.pallavinishanth.android.letsdine.Network.Results;
@@ -61,8 +62,14 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     TextView LocTextView;
     String cityname;
     private Location location;
+
     String state;
     static boolean current_loc = true;
+    static boolean lodge_flag;
+
+    static String loc;
+
+    static int i=0;
 
     final String RES_DATA_API = "https://maps.googleapis.com/maps/";
     private int RADIUS = 10000;
@@ -117,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
         if(mLocationPermissionGranted) {
             location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
+
         }
 
         Geocoder gcd=new Geocoder(this, Locale.getDefault());
@@ -128,6 +136,8 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 {
                     cityname = addresses.get(0).getLocality().toString();
                     //state = addresses.get(0).getAdminArea().toString();
+
+                    Log.d(LOG_TAG, "After back button pressed");
                     LocTextView.setText(cityname);
                 }
 
@@ -158,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
         });
 
 
-        if(current_loc==true) {
+        if(current_loc==true && resJSONdata.isEmpty()) {
             progress_bar.setVisibility(ProgressBar.VISIBLE);
             progressBarIsShowing = true;
             retrofit_response(location.getLatitude() + "," + location.getLongitude());
@@ -187,12 +197,14 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
             @Override
             public void onItemClick(View itemView, int position) {
 
-                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
 
                 Results res_results_card = resJSONdata.get(position);
 
+                ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
+
                 Intent i = new Intent(MainActivity.this, DetailActivity.class);
-                i.putExtra(DetailActivity.EXTRA_NAME, res_results_card);
+                i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
                 startActivity(i);
             }
         });
@@ -221,6 +233,8 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     public void onPlaceSelected(Place place) {
 
         Log.i(LOG_TAG, "Place Selected: " + place.getName());
+
+        loc = place.getName().toString();
 
         LocTextView.setText(place.getName());
         LatLng Sel_location = place.getLatLng();
@@ -262,6 +276,16 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     protected void onStart() {
         super.onStart();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.d(LOG_TAG, "on resume");
+
+        if(current_loc==false)
+        LocTextView.setText(loc);
     }
 
     @Override
@@ -310,9 +334,34 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 resJSONdata = response.body().getResults();
                 res_data_count = resJSONdata.size();
 
+//                i=0;
+
                 for(Results result: resJSONdata){
+
                     Log.v(LOG_TAG, "Nearby Restaurant Name is " + result.getName());
-                    Log.v(LOG_TAG, "Nearby Restaurant price level " + result.getPriceLevel());
+
+//                    //Log.v(LOG_TAG, "Nearby Restaurant price level " + result.getPriceLevel());
+//
+//                        for(String lodge:result.getTypes()) {
+//
+//                            if(lodge.matches("lodging")){
+//
+//                                Log.v(LOG_TAG, "res is a lodge ");
+//                                lodge_flag = true;
+//
+//                                break;
+//                            }else{
+//
+//                                lodge_flag=false;
+//                            }
+//                        }
+//
+//                        if(lodge_flag==true) continue;
+//
+//                        if(lodge_flag==false){
+//                            resJSONFildata.add(i, result);
+//                            i++;
+//                        }
 
                 }
 
