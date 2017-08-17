@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
             resJSONdata = savedInstanceState.getParcelableArrayList("RES_LIST");
             progressBarIsShowing = savedInstanceState.getBoolean("progressBarIsShowing");
             Log.d(LOG_TAG, "After rotating" + LocTextView.getText().toString());
-            Log.d(LOG_TAG, "After rotating" + resJSONdata.get(1).getName().toString());
+//            Log.d(LOG_TAG, "After rotating" + resJSONdata.get(1).getName().toString());
         }
 
         resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);

@@ -98,13 +98,14 @@
                     android:text="@string/address_map"/>
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="@dimen/address_size"
                     android:layout_height="wrap_content"
                     android:id="@+id/address"
                     android:layout_below="@id/address_heading"
                     android:textSize="@dimen/detail_textsize"
                     android:textStyle="italic"
-                    android:layout_marginTop="@dimen/address_margin"/>
+                    android:layout_marginTop="@dimen/address_margin"
+                    android:layout_marginRight="@dimen/address_margin"/>
 
                 <ImageView
                     android:layout_width="@dimen/phone_icon_size"

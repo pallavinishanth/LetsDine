@@ -33,7 +33,7 @@
 
     <dimen name="phone_icon_size">30dp</dimen>
 
-    <dimen name="address_size">220dp</dimen>
+    <dimen name="address_size">260dp</dimen>
 
     <dimen name="photo_padding">8dp</dimen>
     <dimen name="review_padding">8dp</dimen>

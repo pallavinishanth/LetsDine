@@ -45,7 +45,7 @@ public class DetailActivity extends AppCompatActivity {
     public static final String PLACE_ID = "place_id";
     private final String LOG_TAG = DetailActivity.class.getSimpleName();
 
-    private ResDetailAdapter resDetailAdapter;
+    private ResPhotoAdapter resPhotoAdapter;
     private RecyclerView photoRecyclerView;
     private RecyclerView.LayoutManager photoLayoutManager;
 
@@ -53,11 +53,16 @@ public class DetailActivity extends AppCompatActivity {
     private RecyclerView reviewRecyclerView;
     private RecyclerView.LayoutManager reviewLayoutManager;
 
+    private ResDetailAdapter resDetailAdapter;
+    private RecyclerView detailRecyclerView;
+
     private static ArrayList<DetailPhotos> photoslist = new ArrayList<DetailPhotos>();
     private static ArrayList<Reviews> reviewslist = new ArrayList<Reviews>();
     private String placeID;
     final String RES_DETAIL_API = "https://maps.googleapis.com/maps/";
     private static DetailResult detail_result = new DetailResult();
+
+    private static String res_name;
 
     TextView hours_view;
     ImageView res_Photo;
@@ -86,13 +91,46 @@ public class DetailActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
+        if(savedInstanceState !=null){
+            detail_result = savedInstanceState.getParcelable("DETAIL_RESULT");
+        }
+
         placeID = getIntent().getStringExtra(PLACE_ID);
 
         Log.v(LOG_TAG, "Place ID " + placeID);
 
-        retrofit_detail_response(placeID);
-
         Log.v(LOG_TAG, "Place website " + detail_result.getWebsite());
+
+        website_view = (TextView) findViewById(R.id.website_url);
+        hours_view = (TextView) findViewById(R.id.hours);
+        address = (TextView) findViewById(R.id.address);
+        backdrop = (ImageView) findViewById(R.id.res_backdrop);
+        photoHeading = (TextView) findViewById(R.id.photos_heading);
+        reviewHeading = (TextView) findViewById(R.id.Reviews_heading);
+        mapImage = (ImageView) findViewById(R.id.map_image);
+        phoneview = (TextView) findViewById(R.id.phoneNum);
+        phoneicon = (ImageView) findViewById(R.id.phoneIcon);
+
+        photoRecyclerView = (RecyclerView) findViewById(R.id.photos_recycler_view);
+        photoRecyclerView.setHasFixedSize(true);
+        photoLayoutManager = new LinearLayoutManager(DetailActivity.this,
+                LinearLayoutManager.HORIZONTAL, false);
+        photoRecyclerView.setLayoutManager(photoLayoutManager);
+
+        reviewRecyclerView = (RecyclerView) findViewById(R.id.reviews_recycler_view);
+        reviewRecyclerView.setHasFixedSize(true);
+        reviewLayoutManager = new LinearLayoutManager(DetailActivity.this,
+                LinearLayoutManager.VERTICAL, false);
+        reviewRecyclerView.setLayoutManager(reviewLayoutManager);
+
+
+        if(res_name == null) {
+
+            Log.v(LOG_TAG, "First Retrofit call");
+            retrofit_detail_response(placeID);
+        }
+
+
 
     }
 
@@ -100,11 +138,23 @@ public class DetailActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        Log.v(LOG_TAG, "onStart");
+
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
 
-    private void retrofit_detail_response(String place_ID){
+        Log.d(LOG_TAG, "Before rotating" + detail_result.getname());
+
+        Log.d(LOG_TAG, "Before rotating" + detail_result.getWebsite());
+
+        outState.putParcelable("DETAIL_RESULT", detail_result);
+
+        super.onSaveInstanceState(outState);
+
+    }
+
+    private boolean retrofit_detail_response(String place_ID){
 
         Retrofit resDetailRetrofit = new Retrofit.Builder()
                 .baseUrl(RES_DETAIL_API)
@@ -123,27 +173,6 @@ public class DetailActivity extends AppCompatActivity {
                 Log.v(LOG_TAG, "Restaurant Detail Response is " + response.body().getStatus());
 
                 detail_result = response.body().getResults();
-                website_view = (TextView) findViewById(R.id.website_url);
-                hours_view = (TextView) findViewById(R.id.hours);
-                address = (TextView) findViewById(R.id.address);
-                backdrop = (ImageView) findViewById(R.id.res_backdrop);
-                photoHeading = (TextView) findViewById(R.id.photos_heading);
-                reviewHeading = (TextView) findViewById(R.id.Reviews_heading);
-                mapImage = (ImageView) findViewById(R.id.map_image);
-                phoneview = (TextView) findViewById(R.id.phoneNum);
-                phoneicon = (ImageView) findViewById(R.id.phoneIcon);
-
-                photoRecyclerView = (RecyclerView) findViewById(R.id.photos_recycler_view);
-                photoRecyclerView.setHasFixedSize(true);
-                photoLayoutManager = new LinearLayoutManager(DetailActivity.this,
-                        LinearLayoutManager.HORIZONTAL, false);
-                photoRecyclerView.setLayoutManager(photoLayoutManager);
-
-                reviewRecyclerView = (RecyclerView) findViewById(R.id.reviews_recycler_view);
-                reviewRecyclerView.setHasFixedSize(true);
-                reviewLayoutManager = new LinearLayoutManager(DetailActivity.this,
-                        LinearLayoutManager.VERTICAL, false);
-                reviewRecyclerView.setLayoutManager(reviewLayoutManager);
 
                 if(detail_result.getWebsite()!=null){
 
@@ -173,8 +202,8 @@ public class DetailActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View view) {
 
-//                            Toast.makeText(DetailActivity.this, "Phone Icon clicked",
-//                                    Toast.LENGTH_SHORT).show();
+        //                            Toast.makeText(DetailActivity.this, "Phone Icon clicked",
+        //                                    Toast.LENGTH_SHORT).show();
 
                             Intent callIntent = new Intent(Intent.ACTION_DIAL);
                             callIntent.setData(Uri.parse("tel:"+ detail_result.getPhoneNum()));
@@ -209,15 +238,16 @@ public class DetailActivity extends AppCompatActivity {
                 CollapsingToolbarLayout collapsingToolbar =
                         (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 
-                if(!detail_result.getname().isEmpty()){
+                if(detail_result.getname() != null){
 
-                    collapsingToolbar.setTitle(detail_result.getname());
+                    collapsingToolbar.setTitle(detail_result.getname() );
                     collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
                     collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
 
                 }else{
                     collapsingToolbar.setTitle("Restaurant name not found");
                 }
+
 
                 if(!detail_result.getPhotos().isEmpty()){
 
@@ -229,8 +259,8 @@ public class DetailActivity extends AppCompatActivity {
                             +photoslist.get(0).getPhotoReference()
                             +"&key=" + BuildConfig.GOOGLE_PLACES_API_KEY).centerCrop().into(backdrop);
 
-                    resDetailAdapter = new ResDetailAdapter(getBaseContext(), photoslist);
-                    photoRecyclerView.setAdapter(resDetailAdapter);
+                    resPhotoAdapter = new ResPhotoAdapter(getBaseContext(), photoslist);
+                    photoRecyclerView.setAdapter(resPhotoAdapter);
                 }else{
 
 //                    Glide.with(getBaseContext()).load(detail_result.geticon()).centerCrop().into(backdrop);
@@ -264,7 +294,6 @@ public class DetailActivity extends AppCompatActivity {
                         startActivity(mapIntent);
                     }
                 });
-
             }
 
             @Override
@@ -272,6 +301,6 @@ public class DetailActivity extends AppCompatActivity {
                 Log.v(LOG_TAG, "On Failure " + t.toString());
             }
         });
-
+    return true;
     }
 }
