@@ -91,12 +91,6 @@ public class DetailActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-        if(savedInstanceState !=null){
-
-            retrofit_detail_response(placeID);
-            detail_result = savedInstanceState.getParcelable("DETAIL_RESULT");
-        }
-
         placeID = getIntent().getStringExtra(PLACE_ID);
 
         Log.v(LOG_TAG, "Place ID " + placeID);
@@ -125,13 +119,154 @@ public class DetailActivity extends AppCompatActivity {
                 LinearLayoutManager.VERTICAL, false);
         reviewRecyclerView.setLayoutManager(reviewLayoutManager);
 
+        if(savedInstanceState !=null){
 
-//        if(res_name == null) {
-//
-//            Log.v(LOG_TAG, "First Retrofit call");
-//            retrofit_detail_response(placeID);
-//        }
+            detail_result = savedInstanceState.getParcelable("DETAIL_RESULT");
 
+            if(detail_result.getWebsite()!=null){
+
+                Log.v(LOG_TAG, "Place website " + detail_result.getWebsite());
+                website_view.setText(detail_result.getWebsite());
+
+                website_view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW);
+                        browserIntent.setData(Uri.parse(detail_result.getWebsite()));
+                        startActivity(browserIntent);
+                    }
+                });
+
+            }else{
+                website_view.setText("URL not found");
+            }
+
+            if(detail_result.getWebsite()!=null){
+
+                Log.v(LOG_TAG, "Place website " + detail_result.getWebsite());
+                website_view.setText(detail_result.getWebsite());
+
+                website_view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW);
+                        browserIntent.setData(Uri.parse(detail_result.getWebsite()));
+                        startActivity(browserIntent);
+                    }
+                });
+
+            }else{
+                website_view.setText("URL not found");
+            }
+
+            if(detail_result.getPhoneNum()!=null){
+
+                Log.v(LOG_TAG, detail_result.getPhoneNum());
+                phoneview.setText(detail_result.getPhoneNum());
+
+                phoneicon.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        //                            Toast.makeText(DetailActivity.this, "Phone Icon clicked",
+                        //                                    Toast.LENGTH_SHORT).show();
+
+                        Intent callIntent = new Intent(Intent.ACTION_DIAL);
+                        callIntent.setData(Uri.parse("tel:"+ detail_result.getPhoneNum()));
+                        startActivity(callIntent);
+                    }
+                });
+            }else{
+
+                phoneview.setText("Phone Number Not Found");
+            }
+
+            if(detail_result.getDetailOpeningHours()!=null){
+
+                for(int i=0; i<7; i++){
+                    hours_view.append(detail_result.getDetailOpeningHours().getweekhours()[i]);
+                    hours_view.append("\n");
+                    Log.v(LOG_TAG, "hours " + (detail_result.getDetailOpeningHours().getweekhours()[i]));
+                }
+
+            }else{
+                hours_view.setText("Hours not found");
+            }
+
+            if(detail_result.getAddress()!=null){
+
+                Log.v(LOG_TAG, detail_result.getAddress());
+                address.setText(detail_result.getAddress());
+            }else{
+                address.setText("Address not found");
+            }
+
+            CollapsingToolbarLayout collapsingToolbar =
+                    (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+
+            if(detail_result.getname() != null){
+
+                collapsingToolbar.setTitle(detail_result.getname() );
+                collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
+                collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
+
+            }else{
+                collapsingToolbar.setTitle("Restaurant name not found");
+            }
+
+
+            if(!detail_result.getPhotos().isEmpty()){
+
+                Log.v(LOG_TAG, detail_result.getPhotos().get(0).getPhotoReference());
+                Log.v(LOG_TAG, String.format("size = %d", detail_result.getPhotos().size()));
+                photoslist = detail_result.getPhotos();
+
+                Glide.with(getBaseContext()).load("https://maps.googleapis.com/maps/api/place/photo?maxheight=380&photoreference="
+                        +photoslist.get(0).getPhotoReference()
+                        +"&key=" + BuildConfig.GOOGLE_PLACES_API_KEY).centerCrop().into(backdrop);
+
+                resPhotoAdapter = new ResPhotoAdapter(getBaseContext(), photoslist);
+                photoRecyclerView.setAdapter(resPhotoAdapter);
+            }else{
+
+//                    Glide.with(getBaseContext()).load(detail_result.geticon()).centerCrop().into(backdrop);
+                photoHeading.setText("PHOTOS NOT FOUND");
+
+            }
+
+            if(!detail_result.getReviews().isEmpty()){
+                Log.v(LOG_TAG, detail_result.getReviews().get(0).getAuthor_name());
+                Log.v(LOG_TAG, detail_result.getReviews().get(0).getText());
+                Log.v(LOG_TAG, String.format("Review Rating = %d", detail_result.getReviews().get(0).getRating()));
+                reviewslist = detail_result.getReviews();
+
+                resReviewAdapter = new ResReviewsAdapter(getBaseContext(), reviewslist);
+                reviewRecyclerView.setAdapter(resReviewAdapter);
+
+            }else{
+                reviewHeading.setText("REVIEWS NOT FOUND");
+            }
+
+            mapImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+//                        Toast.makeText(DetailActivity.this, "Maps clicked",
+//                                Toast.LENGTH_SHORT).show();
+
+                    Uri gmmIntentUri = Uri.parse("google.navigation:q="+ detail_result.getAddress());
+                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                    mapIntent.setPackage("com.google.android.apps.maps");
+                    startActivity(mapIntent);
+                }
+            });
+
+        }else{
+
+            retrofit_detail_response(placeID);
+        }
     }
 
     @Override
@@ -153,7 +288,7 @@ public class DetailActivity extends AppCompatActivity {
 
     }
 
-    private boolean retrofit_detail_response(String place_ID){
+    private void retrofit_detail_response(String place_ID){
 
         Retrofit resDetailRetrofit = new Retrofit.Builder()
                 .baseUrl(RES_DETAIL_API)
@@ -300,6 +435,5 @@ public class DetailActivity extends AppCompatActivity {
                 Log.v(LOG_TAG, "On Failure " + t.toString());
             }
         });
-    return true;
     }
 }
