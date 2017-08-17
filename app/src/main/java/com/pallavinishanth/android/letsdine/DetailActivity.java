@@ -92,6 +92,8 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         if(savedInstanceState !=null){
+
+            retrofit_detail_response(placeID);
             detail_result = savedInstanceState.getParcelable("DETAIL_RESULT");
         }
 
@@ -124,20 +126,17 @@ public class DetailActivity extends AppCompatActivity {
         reviewRecyclerView.setLayoutManager(reviewLayoutManager);
 
 
-        if(res_name == null) {
-
-            Log.v(LOG_TAG, "First Retrofit call");
-            retrofit_detail_response(placeID);
-        }
-
-
+//        if(res_name == null) {
+//
+//            Log.v(LOG_TAG, "First Retrofit call");
+//            retrofit_detail_response(placeID);
+//        }
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
 
     }
 
