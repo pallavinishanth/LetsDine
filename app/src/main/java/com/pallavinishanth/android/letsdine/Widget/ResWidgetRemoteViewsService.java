@@ -3,14 +3,14 @@ package com.pallavinishanth.android.letsdine.Widget;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
-import com.pallavinishanth.android.letsdine.Network.Results;
 import com.pallavinishanth.android.letsdine.R;
-
-import java.util.ArrayList;
 
 /**
  * Created by PallaviNishanth on 8/14/17.
@@ -27,25 +27,40 @@ public class ResWidgetRemoteViewsService extends RemoteViewsService {
 
 class ResRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
-    private static final String[] items={"lorem", "ipsum", "dolor",
-            "sit", "amet", "consectetuer",
-            "adipiscing", "elit", "morbi",
-            "vel", "ligula", "vitae",
-            "arcu", "aliquet", "mollis",
-            "etiam", "vel", "erat",
-            "placerat", "ante",
-            "porttitor", "sodales",
-            "pellentesque", "augue",
-            "purus"};
-
-    private ArrayList<Results> widget_dataList = new ArrayList<Results>();
+    private static final String LOG_TAG = ResRemoteViewsFactory.class.getSimpleName();
 
     private Context mContext;
     private int mAppWidgetId;
+    private String name;
+    private int size;
+    private String[] nameArray;
+    private String[] vicinityArray;
+    private boolean[] hours;
 
     public ResRemoteViewsFactory(Context context, Intent intent) {
         mContext = context;
         mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        size = preferences.getInt("DataSize", 0);
+
+        Log.d(LOG_TAG, "Widget data size" + size);
+
+        nameArray = new String[size];
+        vicinityArray = new String[size];
+        hours = new boolean[size];
+
+        for(int i=0; i<size; i++) {
+            nameArray[i] = preferences.getString("RESName" + "_" + i, null);
+
+        }
+        for(int i=0; i<size; i++) {
+            vicinityArray[i] = preferences.getString("RESVicinity"+"_" + i, null);
+        }
+        for(int i=0; i<size; i++) {
+            hours[i] = preferences.getBoolean("RESHours"+"_" + i, false);
+        }
+
     }
 
     @Override
@@ -58,7 +73,9 @@ class ResRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     }
 
     public int getCount() {
-        return (items.length);
+
+        return size;
+
     }
 
     public RemoteViews getViewAt(int position) {
@@ -66,16 +83,23 @@ class ResRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         RemoteViews row=new RemoteViews(mContext.getPackageName(),
                 R.layout.widget_item);
 
-        row.setTextViewText(R.id.widget_res_name, items[position]);
-        row.setTextViewText(R.id.widget_res_vicinity, items[position]);
-        row.setTextViewText(R.id.widget_res_hours, items[position]);
+        row.setTextViewText(R.id.widget_res_name, nameArray[position]);
+        row.setTextViewText(R.id.widget_res_vicinity, vicinityArray[position]);
 
-        Intent i=new Intent();
-        Bundle extras=new Bundle();
+        if(hours[position] == true) {
+            row.setTextViewText(R.id.widget_res_hours, "Open Now");
+            row.setTextColor(R.id.widget_res_hours, Color.parseColor("#4CAF50"));
+        }else{
+            row.setTextViewText(R.id.widget_res_hours, "Closed Now");
+            row.setTextColor(R.id.widget_res_hours, Color.RED);
+        }
 
-        extras.putString(ResWidgetProvider.EXTRA_WORD, items[position]);
-        i.putExtras(extras);
-        row.setOnClickFillInIntent(R.id.widget_res_name, i);
+//        Intent i=new Intent();
+//        Bundle extras=new Bundle();
+//
+//        extras.putString(ResWidgetProvider.EXTRA_WORD, items[position]);
+//        i.putExtras(extras);
+//        row.setOnClickFillInIntent(R.id.widget_res_name, i);
 
         return(row);
     }

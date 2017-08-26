@@ -1,7 +1,7 @@
 package com.pallavinishanth.android.letsdine;
 
-import android.appwidget.AppWidgetManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Criteria;
@@ -9,6 +9,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -38,7 +39,6 @@ import com.pallavinishanth.android.letsdine.Network.Photos;
 import com.pallavinishanth.android.letsdine.Network.ResRetrofitAPI;
 import com.pallavinishanth.android.letsdine.Network.ResSearchJSON;
 import com.pallavinishanth.android.letsdine.Network.Results;
-import com.pallavinishanth.android.letsdine.Widget.ResWidgetProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -211,11 +211,14 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
             }
         });
 
+
         // Sending data to Widget
-        Intent widget_intent = new Intent(MainActivity.this, ResWidgetProvider.class);
-        widget_intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        widget_intent.putExtra("widgetData",resJSONdata);
-        sendBroadcast(widget_intent);
+//        Intent widget_intent = new Intent(MainActivity.this, ResWidgetProvider.class);
+//        widget_intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+//        widget_intent.putExtra( "widgetResName",resName_array);
+//        widget_intent.putExtra( "widgetResVicinity",resVicinity_array);
+//        widget_intent.putExtra( "widgetResHours",resOpenClose_array);
+//        sendBroadcast(widget_intent);
 
     }
 
@@ -344,6 +347,23 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 res_data_count = resJSONdata.size();
 
 //                i=0;
+
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putInt("DataSize", res_data_count);
+
+                for(int i=0; i<res_data_count;i++){
+                    editor.putString("RESName"+"_" + i, resJSONdata.get(i).getName());
+
+                }
+                for(int i=0; i<res_data_count;i++){
+                    editor.putString("RESVicinity"+"_" + i, resJSONdata.get(i).getVicinity());
+                }
+                for(int i=0; i<res_data_count;i++){
+                    editor.putBoolean("RESHours"+"_" + i, resJSONdata.get(i).getOpeningHours().getOpenNow());
+                }
+
+                editor.apply();
 
                 for(Results result: resJSONdata){
 

@@ -7,7 +7,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/widget_res_name"
-        android:padding = "@dimen/widget_padding"
         android:textColor="@color/black"
         android:textStyle="bold"
         android:textSize="@dimen/widget_res_name_textsize"/>
@@ -16,14 +15,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/widget_res_vicinity"
-        android:padding = "@dimen/widget_padding"
+        android:paddingTop= "@dimen/widget_padding"
         android:textStyle="italic"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/widget_res_hours"
-        android:padding = "@dimen/widget_padding"
+        android:paddingTop = "@dimen/widget_padding"
         android:textStyle="bold"/>
 
 </LinearLayout>

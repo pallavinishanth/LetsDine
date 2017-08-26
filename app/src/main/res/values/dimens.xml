@@ -48,4 +48,6 @@
 
     <dimen name="widget_res_name_textsize">16sp</dimen>
 
+    <dimen name="widget_margin">8dp</dimen>
+
 </resources>

@@ -20,9 +20,11 @@ public class ResWidgetProvider extends AppWidgetProvider {
 
     private static final String LOG_TAG = ResWidgetProvider.class.getSimpleName();
 
-    public static String EXTRA_WORD= "word";
+    public static String EXTRA_WORD = "word";
 
     public static final String UPDATE_WIDGET = "android.appwidget.action.APPWIDGET_UPDATE";
+
+    private String[] nameArray;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -71,7 +73,6 @@ public class ResWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-
 
         super.onReceive(context, intent);
     }
