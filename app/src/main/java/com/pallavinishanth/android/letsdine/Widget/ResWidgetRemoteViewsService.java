@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.pallavinishanth.android.letsdine.DetailActivity;
 import com.pallavinishanth.android.letsdine.R;
 
 /**
@@ -36,6 +37,7 @@ class ResRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private String[] nameArray;
     private String[] vicinityArray;
     private boolean[] hours;
+    private String[] place_id_array;
 
     public ResRemoteViewsFactory(Context context, Intent intent) {
         mContext = context;
@@ -49,6 +51,12 @@ class ResRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         nameArray = new String[size];
         vicinityArray = new String[size];
         hours = new boolean[size];
+        place_id_array = new String[size];
+
+        for(int i=0; i<size; i++) {
+            place_id_array[i] = preferences.getString("PlaceID"+"_" + i, null);
+
+        }
 
         for(int i=0; i<size; i++) {
             nameArray[i] = preferences.getString("RESName" + "_" + i, null);
@@ -94,12 +102,9 @@ class ResRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
             row.setTextColor(R.id.widget_res_hours, Color.RED);
         }
 
-//        Intent i=new Intent();
-//        Bundle extras=new Bundle();
-//
-//        extras.putString(ResWidgetProvider.EXTRA_WORD, items[position]);
-//        i.putExtras(extras);
-//        row.setOnClickFillInIntent(R.id.widget_res_name, i);
+        final Intent fillInIntent = new Intent();
+        fillInIntent.putExtra(DetailActivity.PLACE_ID, place_id_array[position]);
+        row.setOnClickFillInIntent(R.id.widget_list_item, fillInIntent);
 
         return(row);
     }

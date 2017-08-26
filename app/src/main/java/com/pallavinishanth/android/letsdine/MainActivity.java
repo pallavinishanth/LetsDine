@@ -353,6 +353,11 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 editor.putInt("DataSize", res_data_count);
 
                 for(int i=0; i<res_data_count;i++){
+                    editor.putString("PlaceID"+"_" + i, resJSONdata.get(i).getPlaceId());
+
+                }
+
+                for(int i=0; i<res_data_count;i++){
                     editor.putString("RESName"+"_" + i, resJSONdata.get(i).getName());
 
                 }
