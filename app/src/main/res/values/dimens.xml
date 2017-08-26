@@ -42,7 +42,7 @@
 
     <dimen name="widget_width">294dp</dimen>
     <dimen name="widget_height">146dp</dimen>
-    <dimen name="widget_title_size">22sp</dimen>
+    <dimen name="widget_title_size">18sp</dimen>
 
     <dimen name="widget_padding">4dp</dimen>
 
