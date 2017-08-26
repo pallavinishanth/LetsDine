@@ -14,4 +14,6 @@
     <string name="photos_heading">PHOTOS</string>
 
     <string name="res_detail_activity">RestaurantDetails</string>
+
+    <string name="widget_title">Let\'s Dine</string>
 </resources>

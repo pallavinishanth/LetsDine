@@ -95,8 +95,6 @@ public class DetailActivity extends AppCompatActivity {
 
         Log.v(LOG_TAG, "Place ID " + placeID);
 
-        Log.v(LOG_TAG, "Place website " + detail_result.getWebsite());
-
         website_view = (TextView) findViewById(R.id.website_url);
         hours_view = (TextView) findViewById(R.id.hours);
         address = (TextView) findViewById(R.id.address);
@@ -169,9 +167,6 @@ public class DetailActivity extends AppCompatActivity {
                 phoneicon.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-
-                        //                            Toast.makeText(DetailActivity.this, "Phone Icon clicked",
-                        //                                    Toast.LENGTH_SHORT).show();
 
                         Intent callIntent = new Intent(Intent.ACTION_DIAL);
                         callIntent.setData(Uri.parse("tel:"+ detail_result.getPhoneNum()));
@@ -279,8 +274,6 @@ public class DetailActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
 
         Log.d(LOG_TAG, "Before rotating" + detail_result.getname());
-
-        Log.d(LOG_TAG, "Before rotating" + detail_result.getWebsite());
 
         outState.putParcelable("DETAIL_RESULT", detail_result);
 

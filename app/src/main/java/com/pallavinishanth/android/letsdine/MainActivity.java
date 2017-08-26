@@ -1,5 +1,6 @@
 package com.pallavinishanth.android.letsdine;
 
+import android.appwidget.AppWidgetManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -37,6 +38,7 @@ import com.pallavinishanth.android.letsdine.Network.Photos;
 import com.pallavinishanth.android.letsdine.Network.ResRetrofitAPI;
 import com.pallavinishanth.android.letsdine.Network.ResSearchJSON;
 import com.pallavinishanth.android.letsdine.Network.Results;
+import com.pallavinishanth.android.letsdine.Widget.ResWidgetProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -208,6 +210,13 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 startActivity(i);
             }
         });
+
+        // Sending data to Widget
+        Intent widget_intent = new Intent(MainActivity.this, ResWidgetProvider.class);
+        widget_intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        widget_intent.putExtra("widgetData",resJSONdata);
+        sendBroadcast(widget_intent);
+
     }
 
     @Override
