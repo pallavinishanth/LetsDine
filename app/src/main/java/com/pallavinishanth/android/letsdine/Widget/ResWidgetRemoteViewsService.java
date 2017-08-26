@@ -55,7 +55,6 @@ class ResRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
         for(int i=0; i<size; i++) {
             place_id_array[i] = preferences.getString("PlaceID"+"_" + i, null);
-
         }
 
         for(int i=0; i<size; i++) {
