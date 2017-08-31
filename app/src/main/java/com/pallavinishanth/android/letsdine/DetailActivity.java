@@ -188,7 +188,13 @@ public class DetailActivity extends AppCompatActivity {
 
                 for(int i=0; i<7; i++){
                     hours_view.append(detail_result.getDetailOpeningHours().getweekhours()[i]);
-                    hours_view.setContentDescription(detail_result.getDetailOpeningHours().getweekhours()[i]);
+                    hours_view.setContentDescription(detail_result.getDetailOpeningHours().getweekhours()[0]
+                            + detail_result.getDetailOpeningHours().getweekhours()[1]
+                            + detail_result.getDetailOpeningHours().getweekhours()[2]
+                            + detail_result.getDetailOpeningHours().getweekhours()[3]
+                            + detail_result.getDetailOpeningHours().getweekhours()[4]
+                            + detail_result.getDetailOpeningHours().getweekhours()[5]
+                            + detail_result.getDetailOpeningHours().getweekhours()[6]);
                     hours_view.append("\n");
                     Log.v(LOG_TAG, "hours " + (detail_result.getDetailOpeningHours().getweekhours()[i]));
                 }
@@ -362,7 +368,13 @@ public class DetailActivity extends AppCompatActivity {
 
                     for(int i=0; i<7; i++){
                         hours_view.append(detail_result.getDetailOpeningHours().getweekhours()[i]);
-                        hours_view.setContentDescription(detail_result.getDetailOpeningHours().getweekhours()[i]);
+                        hours_view.setContentDescription(detail_result.getDetailOpeningHours().getweekhours()[0]
+                                + detail_result.getDetailOpeningHours().getweekhours()[1]
+                                + detail_result.getDetailOpeningHours().getweekhours()[2]
+                                + detail_result.getDetailOpeningHours().getweekhours()[3]
+                                + detail_result.getDetailOpeningHours().getweekhours()[4]
+                                + detail_result.getDetailOpeningHours().getweekhours()[5]
+                                + detail_result.getDetailOpeningHours().getweekhours()[6]);
                         hours_view.append("\n");
                         Log.v(LOG_TAG, "hours " + (detail_result.getDetailOpeningHours().getweekhours()[i]));
                     }
