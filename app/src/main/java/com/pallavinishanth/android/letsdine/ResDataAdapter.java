@@ -60,6 +60,7 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
         if(res_results.get(position).getName()!=null) {
 
             holder.res_name_view.setText(res_results.get(position).getName());
+            holder.res_name_view.setContentDescription(res_results.get(position).getName());
         }else{
             holder.res_name_view.setText("Name not Found");
         }
@@ -67,6 +68,7 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
         if(res_results.get(position).getVicinity()!=null) {
 
             holder.res_address_view.setText(res_results.get(position).getVicinity());
+            holder.res_address_view.setContentDescription(res_results.get(position).getVicinity());
         }else{
             holder.res_address_view.setText("Address not Found");
         }
@@ -77,11 +79,13 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
 
                 holder.res_opening_hours.setText("Open Now");
                 holder.res_opening_hours.setTextColor(Color.parseColor("#4CAF50"));
+                holder.res_opening_hours.setContentDescription("Open Now");
 
             } else {
 
                 holder.res_opening_hours.setText("Closed Now");
                 holder.res_opening_hours.setTextColor(Color.RED);
+                holder.res_opening_hours.setContentDescription("Closed Now");
             }
         }
 
@@ -100,9 +104,11 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
         if(res_results.get(position).getRating() == null){
 
             holder.res_rating_view.setText("Rating: - -");
+            holder.res_rating_view.setContentDescription("Rating Not Found");
         } else{
 
             holder.res_rating_view.setText("Rating: " + Double.toString(res_results.get(position).getRating()));
+            holder.res_rating_view.setContentDescription("Rating" + Double.toString(res_results.get(position).getRating()));
         }
 
         if(res_results.get(position).getPriceLevel() != null) {
@@ -111,24 +117,30 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
 
                 case 0:
                     holder.res_pricelevel_view.setText("0");
+                    holder.res_pricelevel_view.setContentDescription("price level Zero");
                     break;
                 case 1:
                     holder.res_pricelevel_view.setText("$");
+                    holder.res_pricelevel_view.setContentDescription("Single Dollar");
                     break;
                 case 2:
                     holder.res_pricelevel_view.setText("$$");
+                    holder.res_pricelevel_view.setContentDescription("Double Dollar");
                     break;
                 case 3:
                     holder.res_pricelevel_view.setText("$$$");
+                    holder.res_pricelevel_view.setContentDescription("Triple Dollar");
                     break;
                 case 4:
                     holder.res_pricelevel_view.setText("$$$$");
+                    holder.res_pricelevel_view.setContentDescription("Four Dollar");
                     break;
                 default:
                     break;
             }
         }else{
             holder.res_pricelevel_view.setText("- - - -");
+            holder.res_pricelevel_view.setContentDescription("Price level not found");
         }
 
     }

@@ -59,6 +59,7 @@ public class ResWidgetProvider extends AppWidgetProvider {
 
             // set intent for item click (opens main activity)
             Intent viewIntent = new Intent(context, DetailActivity.class);
+//            viewIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             viewIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);
             viewIntent.setData(Uri.parse(viewIntent.toUri(Intent.URI_INTENT_SCHEME)));
 

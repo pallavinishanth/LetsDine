@@ -102,6 +102,7 @@ class ResRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         }
 
         final Intent fillInIntent = new Intent();
+//        fillInIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         fillInIntent.putExtra(DetailActivity.PLACE_ID, place_id_array[position]);
         row.setOnClickFillInIntent(R.id.widget_list_item, fillInIntent);
 

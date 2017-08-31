@@ -125,6 +125,7 @@ public class DetailActivity extends AppCompatActivity {
 
                 Log.v(LOG_TAG, "Place website " + detail_result.getWebsite());
                 website_view.setText(detail_result.getWebsite());
+                website_view.setContentDescription(detail_result.getWebsite());
 
                 website_view.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -138,12 +139,14 @@ public class DetailActivity extends AppCompatActivity {
 
             }else{
                 website_view.setText("URL not found");
+                website_view.setContentDescription("URL not found");
             }
 
             if(detail_result.getWebsite()!=null){
 
                 Log.v(LOG_TAG, "Place website " + detail_result.getWebsite());
                 website_view.setText(detail_result.getWebsite());
+                website_view.setContentDescription(detail_result.getWebsite());
 
                 website_view.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -157,12 +160,14 @@ public class DetailActivity extends AppCompatActivity {
 
             }else{
                 website_view.setText("URL not found");
+                website_view.setContentDescription("URL not found");
             }
 
             if(detail_result.getPhoneNum()!=null){
 
                 Log.v(LOG_TAG, detail_result.getPhoneNum());
                 phoneview.setText(detail_result.getPhoneNum());
+                phoneview.setContentDescription(detail_result.getPhoneNum());
 
                 phoneicon.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -176,26 +181,31 @@ public class DetailActivity extends AppCompatActivity {
             }else{
 
                 phoneview.setText("Phone Number Not Found");
+                phoneview.setContentDescription("Phone Number Not Found");
             }
 
             if(detail_result.getDetailOpeningHours()!=null){
 
                 for(int i=0; i<7; i++){
                     hours_view.append(detail_result.getDetailOpeningHours().getweekhours()[i]);
+                    hours_view.setContentDescription(detail_result.getDetailOpeningHours().getweekhours()[i]);
                     hours_view.append("\n");
                     Log.v(LOG_TAG, "hours " + (detail_result.getDetailOpeningHours().getweekhours()[i]));
                 }
 
             }else{
                 hours_view.setText("Hours not found");
+                hours_view.setContentDescription("Hours not found");
             }
 
             if(detail_result.getAddress()!=null){
 
                 Log.v(LOG_TAG, detail_result.getAddress());
                 address.setText(detail_result.getAddress());
+                address.setContentDescription(detail_result.getAddress());
             }else{
                 address.setText("Address not found");
+                address.setContentDescription("Address not found");
             }
 
             CollapsingToolbarLayout collapsingToolbar =
@@ -228,6 +238,7 @@ public class DetailActivity extends AppCompatActivity {
 
 //                    Glide.with(getBaseContext()).load(detail_result.geticon()).centerCrop().into(backdrop);
                 photoHeading.setText("PHOTOS NOT FOUND");
+                photoHeading.setContentDescription("PHOTOS NOT FOUND");
 
             }
 
@@ -242,6 +253,7 @@ public class DetailActivity extends AppCompatActivity {
 
             }else{
                 reviewHeading.setText("REVIEWS NOT FOUND");
+                reviewHeading.setContentDescription("REVIEWS NOT FOUND");
             }
 
             mapImage.setOnClickListener(new View.OnClickListener() {
@@ -305,6 +317,7 @@ public class DetailActivity extends AppCompatActivity {
 
                     Log.v(LOG_TAG, "Place website " + detail_result.getWebsite());
                     website_view.setText(detail_result.getWebsite());
+                    website_view.setContentDescription(detail_result.getWebsite());
 
                     website_view.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -318,12 +331,14 @@ public class DetailActivity extends AppCompatActivity {
 
                 }else{
                     website_view.setText("URL not found");
+                    website_view.setContentDescription("URL not found");
                 }
 
                 if(detail_result.getPhoneNum()!=null){
 
                     Log.v(LOG_TAG, detail_result.getPhoneNum());
                     phoneview.setText(detail_result.getPhoneNum());
+                    phoneview.setContentDescription(detail_result.getPhoneNum());
 
                     phoneicon.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -340,26 +355,31 @@ public class DetailActivity extends AppCompatActivity {
                 }else{
 
                     phoneview.setText("Phone Number Not Found");
+                    phoneview.setContentDescription("Phone Number Not Found");
                 }
 
                 if(detail_result.getDetailOpeningHours()!=null){
 
                     for(int i=0; i<7; i++){
                         hours_view.append(detail_result.getDetailOpeningHours().getweekhours()[i]);
+                        hours_view.setContentDescription(detail_result.getDetailOpeningHours().getweekhours()[i]);
                         hours_view.append("\n");
                         Log.v(LOG_TAG, "hours " + (detail_result.getDetailOpeningHours().getweekhours()[i]));
                     }
 
                 }else{
                     hours_view.setText("Hours not found");
+                    hours_view.setContentDescription("Hours not found");
                 }
 
                 if(detail_result.getAddress()!=null){
 
                     Log.v(LOG_TAG, detail_result.getAddress());
                     address.setText(detail_result.getAddress());
+                    address.setContentDescription(detail_result.getAddress());
                 }else{
                     address.setText("Address not found");
+                    address.setContentDescription("Address not found");
                 }
 
                 CollapsingToolbarLayout collapsingToolbar =
@@ -392,6 +412,7 @@ public class DetailActivity extends AppCompatActivity {
 
 //                    Glide.with(getBaseContext()).load(detail_result.geticon()).centerCrop().into(backdrop);
                     photoHeading.setText("PHOTOS NOT FOUND");
+                    photoHeading.setContentDescription("PHOTOS NOT FOUND");
 
                 }
 
@@ -406,6 +427,7 @@ public class DetailActivity extends AppCompatActivity {
 
                 }else{
                     reviewHeading.setText("REVIEWS NOT FOUND");
+                    reviewHeading.setContentDescription("REVIEWS NOT FOUND");
                 }
 
                 mapImage.setOnClickListener(new View.OnClickListener() {
