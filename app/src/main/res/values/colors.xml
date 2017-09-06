@@ -5,5 +5,17 @@
     <color name="colorAccent">#7C4DFF</color>
 
     <color name="roundcorner">#80CBC4</color>
+    <color name="collapsingbar">#009688</color>
     <color name="black">#000000</color>
+    <color name="grey_300">#E0E0E0</color>
+
+    <color name="Light_green">#8BC34A</color>
+
+    <color name="Green">#4CAF50</color>
+
+    <color name="Blue">#2196F3</color>
+
+    <color name="light_blue">#CFD8DC</color>
+
+    <color name="white">#ffffff</color>
 </resources>

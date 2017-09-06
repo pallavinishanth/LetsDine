@@ -1,34 +1,60 @@
 package com.pallavinishanth.android.letsdine;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.model.LatLng;
+import com.pallavinishanth.android.letsdine.Network.Photos;
+import com.pallavinishanth.android.letsdine.Network.ResRetrofitAPI;
+import com.pallavinishanth.android.letsdine.Network.ResSearchJSON;
+import com.pallavinishanth.android.letsdine.Network.Results;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.GsonConverterFactory;
+import retrofit.Response;
+import retrofit.Retrofit;
+
+import static com.pallavinishanth.android.letsdine.R.layout.activity_main;
 
 public class MainActivity extends AppCompatActivity implements PlaceSelectionListener {
 
@@ -43,20 +69,44 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     TextView LocTextView;
     String cityname;
     private Location location;
+
     String state;
+    static boolean current_loc = true;
+    static boolean lodge_flag;
+
+    static String loc;
+
+    static int i=0;
+
+    final String RES_DATA_API = "https://maps.googleapis.com/maps/";
+    private int RADIUS = 10000;
+    private static ArrayList<Results> resJSONdata = new ArrayList<>();
+
+    private Toolbar mToolbar;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private RecyclerView resRecyclerView;
+    private RecyclerView.LayoutManager resLayoutManager;
+    private ResDataAdapter resDataAdapter;
+    static int res_data_count;
+    ProgressBar progress_bar;
+    boolean progressBarIsShowing;
+    private CoordinatorLayout mCLayout;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Retrieve location and camera position from saved instance state.
-        if (savedInstanceState != null) {
-            location = savedInstanceState.getParcelable(KEY_LOCATION);
+        setContentView(activity_main);
 
-        }
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
+        ActionBar actionBar=getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(true);
 
-        setContentView(R.layout.activity_main);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        progress_bar = (ProgressBar)findViewById(R.id.progressBar);
+        mCLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
 
         LocTextView = (TextView)findViewById(R.id.location);
 
@@ -83,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
         if(mLocationPermissionGranted) {
             location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
+
         }
 
         Geocoder gcd=new Geocoder(this, Locale.getDefault());
@@ -94,6 +145,8 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 {
                     cityname = addresses.get(0).getLocality().toString();
                     //state = addresses.get(0).getAdminArea().toString();
+
+                    Log.d(LOG_TAG, "After back button pressed");
                     LocTextView.setText(cityname);
                 }
 
@@ -107,8 +160,13 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
             public void onClick(View view) {
 
                 try {
+
+                    AutocompleteFilter locationFilter = new AutocompleteFilter.Builder()
+                            .setTypeFilter(AutocompleteFilter.TYPE_FILTER_CITIES)
+                            .build();
+
                     Intent intent = new PlaceAutocomplete.IntentBuilder
-                            (PlaceAutocomplete.MODE_FULLSCREEN)
+                            (PlaceAutocomplete.MODE_FULLSCREEN).setFilter(locationFilter)
                             .build(MainActivity.this);
                     startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
                 } catch (GooglePlayServicesRepairableException |
@@ -117,6 +175,59 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 }
             }
         });
+
+
+        if(current_loc==true && resJSONdata.isEmpty()) {
+            progress_bar.setVisibility(ProgressBar.VISIBLE);
+            progressBarIsShowing = true;
+            retrofit_response(location.getLatitude() + "," + location.getLongitude());
+        }
+
+        // Retrieve location from saved instance state.
+        if (savedInstanceState != null) {
+            LocTextView.setText(savedInstanceState.getString(KEY_LOCATION));
+            resJSONdata = savedInstanceState.getParcelableArrayList("RES_LIST");
+            progressBarIsShowing = savedInstanceState.getBoolean("progressBarIsShowing");
+            Log.d(LOG_TAG, "After rotating" + LocTextView.getText().toString());
+//            Log.d(LOG_TAG, "After rotating" + resJSONdata.get(1).getName().toString());
+        }
+
+        resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        resRecyclerView.setHasFixedSize(true);
+
+        resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        resRecyclerView.setLayoutManager(resLayoutManager);
+
+        resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
+        resRecyclerView.setAdapter(resDataAdapter);
+
+        resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(View itemView, int position) {
+
+//                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
+
+                Results res_results_card = resJSONdata.get(position);
+
+                ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
+
+                Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Bundle bundle = ActivityOptionsCompat
+                            .makeSceneTransitionAnimation(MainActivity.this)
+                            .toBundle();
+
+                    startActivity(i, bundle);
+                }else{
+                    startActivity(i);
+                }
+
+            }
+        });
+
     }
 
     @Override
@@ -143,8 +254,15 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
         Log.i(LOG_TAG, "Place Selected: " + place.getName());
 
-        LocTextView.setText(place.getName());
+        loc = place.getName().toString();
 
+        LocTextView.setText(place.getName());
+        LatLng Sel_location = place.getLatLng();
+
+        current_loc = false;
+        progress_bar.setVisibility(ProgressBar.VISIBLE);
+        progressBarIsShowing = true;
+        retrofit_response(Sel_location.latitude +"," +Sel_location.longitude);
     }
 
     @Override
@@ -157,12 +275,20 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     }
 
     /**
-     * Saves the state of the map when the activity is paused.
+     * Saves the location when the activity is paused.
      */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-            outState.putParcelable(KEY_LOCATION, location);
-            super.onSaveInstanceState(outState);
+
+        Log.d(LOG_TAG, "Before rotating" + LocTextView.getText().toString());
+
+        outState.putString(KEY_LOCATION, LocTextView.getText().toString());
+        outState.putParcelableArrayList("RES_LIST", resJSONdata);
+        if (progressBarIsShowing) {
+            outState.putBoolean("progressBarIsShowing", progressBarIsShowing);
+        }
+
+        super.onSaveInstanceState(outState);
 
     }
 
@@ -170,6 +296,16 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     protected void onStart() {
         super.onStart();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.d(LOG_TAG, "on resume");
+
+        if(current_loc==false)
+        LocTextView.setText(loc);
     }
 
     @Override
@@ -195,5 +331,94 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 return super.onOptionsItemSelected(item);
 
         }
+    }
+
+    private void retrofit_response(String location){
+
+        Retrofit resRetrofit = new Retrofit.Builder()
+                .baseUrl(RES_DATA_API)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ResRetrofitAPI retrofitAPI = resRetrofit.create(ResRetrofitAPI.class);
+
+        Call<ResSearchJSON> call = retrofitAPI.getNearbyRestaurants(location, RADIUS,
+                BuildConfig.GOOGLE_PLACES_API_KEY);
+
+        call.enqueue(new Callback<ResSearchJSON>() {
+            @Override
+            public void onResponse(Response<ResSearchJSON> response, Retrofit retrofit) {
+
+                Log.v(LOG_TAG, "Restaurant search Response is " + response.body().getStatus());
+
+                resJSONdata = response.body().getResults();
+                res_data_count = resJSONdata.size();
+
+//                i=0;
+
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putInt("DataSize", res_data_count);
+
+                for(int i=0; i<res_data_count;i++){
+                    editor.putString("PlaceID"+"_" + i, resJSONdata.get(i).getPlaceId());
+
+                }
+
+                for(int i=0; i<res_data_count;i++){
+                    editor.putString("RESName"+"_" + i, resJSONdata.get(i).getName());
+
+                }
+                for(int i=0; i<res_data_count;i++){
+                    editor.putString("RESVicinity"+"_" + i, resJSONdata.get(i).getVicinity());
+                }
+                for(int i=0; i<res_data_count;i++){
+                    editor.putBoolean("RESHours"+"_" + i, resJSONdata.get(i).getOpeningHours().getOpenNow());
+                }
+
+                editor.apply();
+
+                for(Results result: resJSONdata){
+
+                    Log.v(LOG_TAG, "Nearby Restaurant Name is " + result.getName());
+
+//                    //Log.v(LOG_TAG, "Nearby Restaurant price level " + result.getPriceLevel());
+//
+//                        for(String lodge:result.getTypes()) {
+//
+//                            if(lodge.matches("lodging")){
+//
+//                                Log.v(LOG_TAG, "res is a lodge ");
+//                                lodge_flag = true;
+//
+//                                break;
+//                            }else{
+//
+//                                lodge_flag=false;
+//                            }
+//                        }
+//
+//                        if(lodge_flag==true) continue;
+//
+//                        if(lodge_flag==false){
+//                            resJSONFildata.add(i, result);
+//                            i++;
+//                        }
+
+                }
+
+                progress_bar.setVisibility(ProgressBar.INVISIBLE);
+
+                resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
+                resRecyclerView.setAdapter(resDataAdapter);
+
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.v(LOG_TAG, "On Failure" + t.toString());
+            }
+        });
+
     }
 }
