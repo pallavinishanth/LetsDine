@@ -2,6 +2,7 @@ package com.pallavinishanth.android.letsdine;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
@@ -10,6 +11,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -297,6 +299,18 @@ public class DetailActivity extends AppCompatActivity {
 
         super.onSaveInstanceState(outState);
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    DetailActivity.this.finishAfterTransition();
+                }
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void retrofit_detail_response(String place_ID){

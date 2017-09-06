@@ -8,9 +8,12 @@ import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -51,6 +54,8 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
+import static com.pallavinishanth.android.letsdine.R.layout.activity_main;
+
 public class MainActivity extends AppCompatActivity implements PlaceSelectionListener {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -85,13 +90,14 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     static int res_data_count;
     ProgressBar progress_bar;
     boolean progressBarIsShowing;
+    private CoordinatorLayout mCLayout;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_main);
+        setContentView(activity_main);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -100,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         progress_bar = (ProgressBar)findViewById(R.id.progressBar);
+        mCLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
 
         LocTextView = (TextView)findViewById(R.id.location);
 
@@ -207,18 +214,19 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
                 Intent i = new Intent(MainActivity.this, DetailActivity.class);
                 i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
-                startActivity(i);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Bundle bundle = ActivityOptionsCompat
+                            .makeSceneTransitionAnimation(MainActivity.this)
+                            .toBundle();
+
+                    startActivity(i, bundle);
+                }else{
+                    startActivity(i);
+                }
+
             }
         });
-
-
-        // Sending data to Widget
-//        Intent widget_intent = new Intent(MainActivity.this, ResWidgetProvider.class);
-//        widget_intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-//        widget_intent.putExtra( "widgetResName",resName_array);
-//        widget_intent.putExtra( "widgetResVicinity",resVicinity_array);
-//        widget_intent.putExtra( "widgetResHours",resOpenClose_array);
-//        sendBroadcast(widget_intent);
 
     }
 
