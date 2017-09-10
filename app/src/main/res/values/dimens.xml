@@ -50,4 +50,8 @@
 
     <dimen name="widget_margin">8dp</dimen>
 
+    <dimen name="fav_heart">40dp</dimen>
+
+    <dimen name="fav_heart_padding">12dp</dimen>
+
 </resources>

@@ -19,6 +19,7 @@
 
     <!-- Content Description -->
     <string name="Restaurant_List">Restaurants List</string>
+    <string name="Fav_Restaurant_List">Favorite Restaurants List</string>
     <string name="ChangeLocation">Change Location</string>
     <string name="ResThumbNail">Restaurant ThumbNail</string>
     <string name="res_hours">Restaurant Hours</string>
@@ -28,5 +29,7 @@
     <string name="website">Website URL </string>
     <string name="Res_images">Restaurant Images </string>
     <string name="Res_Reviews">Restaurant Reviews</string>
+
+    <string name="content_authority">com.pallavinishanth.android.letsdine</string>
 
 </resources>

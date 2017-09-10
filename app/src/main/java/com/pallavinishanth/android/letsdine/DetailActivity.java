@@ -1,6 +1,9 @@
 package com.pallavinishanth.android.letsdine;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,8 +18,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.pallavinishanth.android.letsdine.Data.ResContract;
 import com.pallavinishanth.android.letsdine.Network.DetailPhotos;
 import com.pallavinishanth.android.letsdine.Network.DetailResult;
 import com.pallavinishanth.android.letsdine.Network.ResDetailJSON;
@@ -76,6 +81,9 @@ public class DetailActivity extends AppCompatActivity {
     ImageView mapImage;
     TextView phoneview;
     ImageView phoneicon;
+    ImageView fav_heart;
+
+    boolean markedFav, delete_result, insert_result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +114,8 @@ public class DetailActivity extends AppCompatActivity {
         mapImage = (ImageView) findViewById(R.id.map_image);
         phoneview = (TextView) findViewById(R.id.phoneNum);
         phoneicon = (ImageView) findViewById(R.id.phoneIcon);
+        fav_heart = (ImageView) findViewById(R.id.fav_heart);
+
 
         photoRecyclerView = (RecyclerView) findViewById(R.id.photos_recycler_view);
         photoRecyclerView.setHasFixedSize(true);
@@ -120,6 +130,8 @@ public class DetailActivity extends AppCompatActivity {
         reviewRecyclerView.setLayoutManager(reviewLayoutManager);
 
         if(savedInstanceState !=null){
+
+            markedFav = savedInstanceState.getBoolean("M_marked");
 
             detail_result = savedInstanceState.getParcelable("DETAIL_RESULT");
 
@@ -296,8 +308,73 @@ public class DetailActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "Before rotating" + detail_result.getname());
 
         outState.putParcelable("DETAIL_RESULT", detail_result);
+        outState.putBoolean("M_marked", markedFav);
 
         super.onSaveInstanceState(outState);
+
+    }
+
+    public Boolean ResMarkedFav(String res_name){
+
+        Log.d(LOG_TAG, "ResMarkedFav "+ res_name);
+
+        Cursor cursor;
+
+        cursor = getContentResolver().query(ResContract.ResEntry.CONTENT_URI,
+                new String[] {ResContract.ResEntry.COLUMN_RES_NAME},
+                ResContract.ResEntry.COLUMN_RES_NAME + "=" + "'" +res_name + "'",
+                null, null, null);
+
+        if(cursor.getCount()==0)
+            return false;
+        else
+            return true;
+    }
+
+    public boolean insertFavMovieData(String place_id, String name, String vicinity){
+
+
+        ContentValues mvalues = new ContentValues();
+
+        mvalues.put(ResContract.ResEntry.COLUMN_PLACE_ID, place_id);
+        mvalues.put(ResContract.ResEntry.COLUMN_RES_NAME, name);
+        mvalues.put(ResContract.ResEntry.COLUMN_RES_VICINITY, vicinity);
+
+        // Finally, insert movie data into the database.
+        Uri insertedUri = getContentResolver().insert(
+                ResContract.ResEntry.CONTENT_URI,
+                mvalues);
+
+        Long result_id = ContentUris.parseId(insertedUri);
+
+        if(result_id>0 && result_id!=-1){
+            Log.v(LOG_TAG, "Insertion Successfuly "+ name);
+            return true;
+
+        }else {
+
+            Log.v(LOG_TAG, "Insertion failed "+ name);
+            return false;
+        }
+
+    }
+
+    public boolean DeleteFavResData(String res_name){
+
+        int no_rows_deleted = getContentResolver()
+                .delete(ResContract.ResEntry.CONTENT_URI,
+                        ResContract.ResEntry.COLUMN_RES_NAME + "=" + res_name, null);
+
+        Log.v(LOG_TAG, "Deleted Movie Data "+ res_name + "rows " + no_rows_deleted);
+
+        if(no_rows_deleted > 0){
+
+            return true;
+
+        }else {
+
+            return false;
+        }
 
     }
 
@@ -467,6 +544,63 @@ public class DetailActivity extends AppCompatActivity {
                         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                         mapIntent.setPackage("com.google.android.apps.maps");
                         startActivity(mapIntent);
+                    }
+                });
+
+                markedFav = ResMarkedFav(detail_result.getname());
+
+                if(markedFav){
+
+                    fav_heart.setImageResource(R.drawable.ic_favorite_white_24dp);
+                }else{
+
+                    fav_heart.setImageResource(R.drawable.ic_favorite_border_white_24dp);
+                }
+
+                fav_heart.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        Toast.makeText(DetailActivity.this, "Fav Hear clicked", Toast.LENGTH_SHORT).show();
+
+                        if(markedFav){
+
+                            delete_result = DeleteFavResData(detail_result.getname());
+
+                            if(delete_result){
+                                markedFav = false;
+                                fav_heart.setImageResource(R.drawable.ic_favorite_border_white_24dp);
+                                Toast.makeText(DetailActivity.this,
+                                        "Deleted from Favorites", Toast.LENGTH_SHORT).show();
+
+                            }else{
+
+                                fav_heart.setImageResource(R.drawable.ic_favorite_white_24dp);
+                                Toast.makeText(DetailActivity.this,
+                                        "Deletion Failed", Toast.LENGTH_SHORT).show();
+                            }
+                        }else{
+
+                            insert_result = insertFavMovieData(placeID, detail_result.getname(),
+                                    detail_result.getAddress());
+
+                            if(insert_result){
+
+                                markedFav = true;
+                                fav_heart.setImageResource(R.drawable.ic_favorite_white_24dp);
+                                Toast.makeText(DetailActivity.this,
+                                        "Added to Favorites", Toast.LENGTH_SHORT).show();
+
+                            }else{
+
+                                fav_heart.setImageResource(R.drawable.ic_favorite_border_white_24dp);
+                                Toast.makeText(DetailActivity.this,
+                                        "Adding to Fav Failed", Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
+
+
                     }
                 });
             }
