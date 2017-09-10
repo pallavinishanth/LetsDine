@@ -26,7 +26,7 @@ public class ResDbHelper extends SQLiteOpenHelper {
                 "(" +
                 ResContract.ResEntry.COLUMN_PLACE_ID + " TEXT NOT NULL," +
                 ResContract.ResEntry.COLUMN_RES_NAME + " TEXT NOT NULL PRIMARY KEY," +
-                ResContract.ResEntry.COLUMN_RES_VICINITY + " TEXT NOT NULL," +
+                ResContract.ResEntry.COLUMN_RES_VICINITY + " TEXT NOT NULL" +
                 ");";
 
         sqLiteDatabase.execSQL(SQL_CREATE_FAVRES_TABLE);

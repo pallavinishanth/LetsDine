@@ -30,4 +30,6 @@
     <string name="Res_images">Restaurant Images </string>
     <string name="Res_Reviews">Restaurant Reviews</string>
 
+    <string name="content_authority">com.pallavinishanth.android.letsdine</string>
+
 </resources>
