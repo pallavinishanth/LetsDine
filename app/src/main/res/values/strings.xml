@@ -19,6 +19,7 @@
 
     <!-- Content Description -->
     <string name="Restaurant_List">Restaurants List</string>
+    <string name="Fav_Restaurant_List">Favorite Restaurants List</string>
     <string name="ChangeLocation">Change Location</string>
     <string name="ResThumbNail">Restaurant ThumbNail</string>
     <string name="res_hours">Restaurant Hours</string>
