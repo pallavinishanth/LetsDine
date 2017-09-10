@@ -1,7 +1,6 @@
 package com.pallavinishanth.android.letsdine.Data;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
@@ -42,10 +41,13 @@ public final class ResContract {
 
         public static final String COLUMN_RES_VICINITY = "res_vicinity";
 
-        public static Uri buildFavResUri(long id) {
-            return ContentUris.withAppendedId(CONTENT_URI, id);
+        public static Uri buildFavResUri(String name) {
+            return CONTENT_URI.buildUpon().appendEncodedPath(name).build();
         }
 
+        public static String getFavResName(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
 
     }
 }
