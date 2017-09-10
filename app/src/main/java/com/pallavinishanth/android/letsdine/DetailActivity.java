@@ -364,7 +364,7 @@ public class DetailActivity extends AppCompatActivity {
 
         int no_rows_deleted = getContentResolver()
                 .delete(ResContract.ResEntry.buildFavResUri(res_name),
-                        ResContract.ResEntry.COLUMN_RES_NAME + "=" + res_name, null);
+                        ResContract.ResEntry.COLUMN_RES_NAME + "=" + "'" +res_name + "'", null);
 
         Log.v(LOG_TAG, "Deleted Movie Data "+ res_name + "rows " + no_rows_deleted);
 
