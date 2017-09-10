@@ -1,5 +1,6 @@
 package com.pallavinishanth.android.letsdine;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -26,7 +27,7 @@ public class FavoriteActivity extends AppCompatActivity {
 
     String[] res_names;
     String[] res_address;
-    String PlaceID;
+    static String[] PlaceID;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,6 +50,10 @@ public class FavoriteActivity extends AppCompatActivity {
             public void onItemClick(View itemView, int position) {
 
                 Toast.makeText(FavoriteActivity.this, "Fav Restaurant clicked", Toast.LENGTH_SHORT).show();
+
+                Intent i = new Intent(FavoriteActivity.this, DetailActivity.class);
+                i.putExtra(DetailActivity.PLACE_ID, PlaceID[position]);
+                startActivity(i);
             }
         });
     }
@@ -77,6 +82,7 @@ public class FavoriteActivity extends AppCompatActivity {
 
             res_names = new String[favrescursor.getCount()];
             res_address = new String[favrescursor.getCount()];
+            PlaceID = new String[favrescursor.getCount()];
 
             do{
 
@@ -84,6 +90,8 @@ public class FavoriteActivity extends AppCompatActivity {
                         getString(favrescursor.getColumnIndex(ResContract.ResEntry.COLUMN_RES_NAME));
                 res_address[i] = favrescursor.
                         getString(favrescursor.getColumnIndex(ResContract.ResEntry.COLUMN_RES_VICINITY));
+                PlaceID[i] = favrescursor.
+                        getString(favrescursor.getColumnIndex(ResContract.ResEntry.COLUMN_PLACE_ID));
                 i++;
 
             }while(favrescursor.moveToNext());

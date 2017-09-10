@@ -31,6 +31,14 @@
                 android:value="com.pallavinishanth.android.letsdine.DetailActivity" />
         </activity>
 
+        <activity
+            android:name=".FavoriteActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.pallavinishanth.android.letsdine.FavoriteActivity" />
+        </activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/Places_API_KEY"/>

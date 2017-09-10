@@ -32,4 +32,7 @@
 
     <string name="content_authority">com.pallavinishanth.android.letsdine</string>
 
+    <string name="action_fav">Favorite</string>
+    <string name="fav_heading">Favorite Restaurants</string>
+
 </resources>

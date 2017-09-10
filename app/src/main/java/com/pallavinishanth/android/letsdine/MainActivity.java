@@ -323,6 +323,9 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
                 Toast.makeText(getApplicationContext(), "On select of favorite", Toast.LENGTH_SHORT).show();
+
+                Intent i = new Intent(MainActivity.this, FavoriteActivity.class);
+                startActivity(i);
                 return true;
 
             default:

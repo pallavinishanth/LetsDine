@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -81,7 +82,7 @@ public class DetailActivity extends AppCompatActivity {
     ImageView mapImage;
     TextView phoneview;
     ImageView phoneicon;
-    ImageView fav_heart;
+    FloatingActionButton fav_fab;
 
     boolean markedFav, delete_result, insert_result;
 
@@ -114,7 +115,7 @@ public class DetailActivity extends AppCompatActivity {
         mapImage = (ImageView) findViewById(R.id.map_image);
         phoneview = (TextView) findViewById(R.id.phoneNum);
         phoneicon = (ImageView) findViewById(R.id.phoneIcon);
-        fav_heart = (ImageView) findViewById(R.id.fav_heart);
+        fav_fab = (FloatingActionButton) findViewById(R.id.fav_fab);
 
 
         photoRecyclerView = (RecyclerView) findViewById(R.id.photos_recycler_view);
@@ -362,8 +363,8 @@ public class DetailActivity extends AppCompatActivity {
     public boolean DeleteFavResData(String res_name){
 
         int no_rows_deleted = getContentResolver()
-                .delete(ResContract.ResEntry.CONTENT_URI,
-                        ResContract.ResEntry.COLUMN_RES_NAME + "=" + res_name, null);
+                .delete(ResContract.ResEntry.buildFavResUri(res_name),
+                        ResContract.ResEntry.COLUMN_RES_NAME + "=" + "'" +res_name + "'", null);
 
         Log.v(LOG_TAG, "Deleted Movie Data "+ res_name + "rows " + no_rows_deleted);
 
@@ -551,13 +552,13 @@ public class DetailActivity extends AppCompatActivity {
 
                 if(markedFav){
 
-                    fav_heart.setImageResource(R.drawable.ic_favorite_white_24dp);
+                    fav_fab.setImageResource(R.drawable.ic_favorite_white_24dp);
                 }else{
 
-                    fav_heart.setImageResource(R.drawable.ic_favorite_border_white_24dp);
+                    fav_fab.setImageResource(R.drawable.ic_favorite_border_white_24dp);
                 }
 
-                fav_heart.setOnClickListener(new View.OnClickListener() {
+                fav_fab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 
@@ -569,13 +570,13 @@ public class DetailActivity extends AppCompatActivity {
 
                             if(delete_result){
                                 markedFav = false;
-                                fav_heart.setImageResource(R.drawable.ic_favorite_border_white_24dp);
+                                fav_fab.setImageResource(R.drawable.ic_favorite_border_white_24dp);
                                 Toast.makeText(DetailActivity.this,
                                         "Deleted from Favorites", Toast.LENGTH_SHORT).show();
 
                             }else{
 
-                                fav_heart.setImageResource(R.drawable.ic_favorite_white_24dp);
+                                fav_fab.setImageResource(R.drawable.ic_favorite_white_24dp);
                                 Toast.makeText(DetailActivity.this,
                                         "Deletion Failed", Toast.LENGTH_SHORT).show();
                             }
@@ -587,13 +588,13 @@ public class DetailActivity extends AppCompatActivity {
                             if(insert_result){
 
                                 markedFav = true;
-                                fav_heart.setImageResource(R.drawable.ic_favorite_white_24dp);
+                                fav_fab.setImageResource(R.drawable.ic_favorite_white_24dp);
                                 Toast.makeText(DetailActivity.this,
                                         "Added to Favorites", Toast.LENGTH_SHORT).show();
 
                             }else{
 
-                                fav_heart.setImageResource(R.drawable.ic_favorite_border_white_24dp);
+                                fav_fab.setImageResource(R.drawable.ic_favorite_border_white_24dp);
                                 Toast.makeText(DetailActivity.this,
                                         "Adding to Fav Failed", Toast.LENGTH_SHORT).show();
                             }

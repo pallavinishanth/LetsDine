@@ -39,7 +39,7 @@ public class ResProvider extends ContentProvider {
         final String authority = ResContract.CONTENT_AUTHORITY;
 
         matcher.addURI(authority, ResContract.PATH_RES, RESTAURANTS);
-        matcher.addURI(authority, ResContract.PATH_RES + "/#", RES_WITH_NAME);
+        matcher.addURI(authority, ResContract.PATH_RES + "/*", RES_WITH_NAME);
 
         return matcher;
     }
@@ -86,7 +86,7 @@ public class ResProvider extends ContentProvider {
 
                 if(_id >0){
 
-                    returnUri = ResContract.ResEntry.buildFavResUri(_id);
+                    returnUri = ResContract.ResEntry.buildFavResUri(String.valueOf(_id));
                 }else
 
                     throw new android.database.SQLException("Failed to insert row into " + uri);
@@ -120,6 +120,9 @@ public class ResProvider extends ContentProvider {
         switch(match){
 
             case RES_WITH_NAME:
+
+                String name = ResContract.ResEntry.getFavResName(uri);
+                selection = ResContract.ResEntry.COLUMN_RES_NAME + "=" + "'"+ name + "'";
                 rowsDeleted = db.delete(ResContract.ResEntry.TABLE_NAME, selection, selectionArgs);
                 break;
 

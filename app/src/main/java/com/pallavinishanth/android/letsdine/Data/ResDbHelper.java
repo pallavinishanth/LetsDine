@@ -24,6 +24,7 @@ public class ResDbHelper extends SQLiteOpenHelper {
         final String SQL_CREATE_FAVRES_TABLE = " CREATE TABLE IF NOT EXISTS " +
                 ResContract.ResEntry.TABLE_NAME +
                 "(" +
+                ResContract.ResEntry._ID + " INTEGER," +
                 ResContract.ResEntry.COLUMN_PLACE_ID + " TEXT NOT NULL," +
                 ResContract.ResEntry.COLUMN_RES_NAME + " TEXT NOT NULL PRIMARY KEY," +
                 ResContract.ResEntry.COLUMN_RES_VICINITY + " TEXT NOT NULL" +
