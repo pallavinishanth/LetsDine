@@ -49,7 +49,7 @@ public class FavoriteActivity extends AppCompatActivity {
             @Override
             public void onItemClick(View itemView, int position) {
 
-                Toast.makeText(FavoriteActivity.this, "Fav Restaurant clicked", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(FavoriteActivity.this, "Fav Restaurant clicked", Toast.LENGTH_SHORT).show();
 
                 Intent i = new Intent(FavoriteActivity.this, DetailActivity.class);
                 i.putExtra(DetailActivity.PLACE_ID, PlaceID[position]);
