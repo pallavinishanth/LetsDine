@@ -322,7 +322,7 @@ public class DetailActivity extends AppCompatActivity {
 
         cursor = getContentResolver().query(ResContract.ResEntry.CONTENT_URI,
                 new String[] {ResContract.ResEntry.COLUMN_RES_NAME},
-                ResContract.ResEntry.COLUMN_RES_NAME + "=" + res_name,
+                ResContract.ResEntry.COLUMN_RES_NAME + "=" + "'" +res_name + "'",
                 null, null, null);
 
         if(cursor.getCount()==0)
