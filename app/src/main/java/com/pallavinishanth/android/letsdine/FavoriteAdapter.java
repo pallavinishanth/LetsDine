@@ -40,7 +40,9 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
 
         holder.restextview.setText(resName[position]);
+        holder.restextview.setContentDescription(resName[position]);
         holder.resaddtextview.setText(resAdd[position]);
+        holder.resaddtextview.setContentDescription(resAdd[position]);
 
     }
 

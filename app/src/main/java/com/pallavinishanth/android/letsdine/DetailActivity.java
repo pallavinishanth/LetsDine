@@ -562,7 +562,7 @@ public class DetailActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
 
-                        Toast.makeText(DetailActivity.this, "Fav Hear clicked", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(DetailActivity.this, "Fav Heart clicked", Toast.LENGTH_SHORT).show();
 
                         if(markedFav){
 

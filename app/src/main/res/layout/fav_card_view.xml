@@ -22,7 +22,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/fav_res_name"
                 android:textColor="@color/black"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"

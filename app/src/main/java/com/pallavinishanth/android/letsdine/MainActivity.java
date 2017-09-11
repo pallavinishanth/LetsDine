@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
     String state;
     static boolean current_loc = true;
-    static boolean lodge_flag;
 
     static String loc;
 
@@ -322,7 +321,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
             case R.id.action_favorite:
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
-                Toast.makeText(getApplicationContext(), "On select of favorite", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "On select of favorite", Toast.LENGTH_SHORT).show();
 
                 Intent i = new Intent(MainActivity.this, FavoriteActivity.class);
                 startActivity(i);
@@ -357,8 +356,6 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 resJSONdata = response.body().getResults();
                 res_data_count = resJSONdata.size();
 
-//                i=0;
-
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putInt("DataSize", res_data_count);
@@ -384,29 +381,6 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 for(Results result: resJSONdata){
 
                     Log.v(LOG_TAG, "Nearby Restaurant Name is " + result.getName());
-
-//                    //Log.v(LOG_TAG, "Nearby Restaurant price level " + result.getPriceLevel());
-//
-//                        for(String lodge:result.getTypes()) {
-//
-//                            if(lodge.matches("lodging")){
-//
-//                                Log.v(LOG_TAG, "res is a lodge ");
-//                                lodge_flag = true;
-//
-//                                break;
-//                            }else{
-//
-//                                lodge_flag=false;
-//                            }
-//                        }
-//
-//                        if(lodge_flag==true) continue;
-//
-//                        if(lodge_flag==false){
-//                            resJSONFildata.add(i, result);
-//                            i++;
-//                        }
 
                 }
 
