@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
     String state;
     static boolean current_loc = true;
-    static boolean lodge_flag;
 
     static String loc;
 
