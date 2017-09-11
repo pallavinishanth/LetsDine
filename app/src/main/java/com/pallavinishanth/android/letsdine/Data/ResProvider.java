@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import static android.R.attr.name;
+
 /**
  * Created by PallaviNishanth on 9/8/17.
  */
@@ -121,8 +123,8 @@ public class ResProvider extends ContentProvider {
 
             case RES_WITH_NAME:
 
-                String name = ResContract.ResEntry.getFavResName(uri);
-                selection = ResContract.ResEntry.COLUMN_RES_NAME + "=" + "'"+ name + "'";
+                String placeid = ResContract.ResEntry.getFavResName(uri);
+                selection = ResContract.ResEntry.COLUMN_PLACE_ID + "=" + "'"+ placeid + "'";
                 rowsDeleted = db.delete(ResContract.ResEntry.TABLE_NAME, selection, selectionArgs);
                 break;
 

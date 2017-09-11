@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pallavinishanth.android.letsdine.Data.ResContract;
@@ -28,12 +29,18 @@ public class FavoriteActivity extends AppCompatActivity {
     String[] res_names;
     String[] res_address;
     static String[] PlaceID;
+    TextView fav_textview;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.favorite_layout);
+
+        fav_textview = (TextView) findViewById(R.id.fav_heading);
+
+        if(res_names == null && res_address == null)
+            fav_textview.setText("No Favorites to show");
 
         favRecyclerView = (RecyclerView) findViewById(R.id.fav_recycler_view);
         favRecyclerView.setHasFixedSize(true);

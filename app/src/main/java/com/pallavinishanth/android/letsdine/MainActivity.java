@@ -11,6 +11,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -69,6 +70,13 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     TextView LocTextView;
     String cityname;
     private Location location;
+    public static double latitude;
+    public static double longitude;
+    public LocationManager locationManager;
+    Criteria criteria;
+
+    public double default_latitude = 40.7128;
+    public double default_longitude = 74.0059;
 
     String state;
     static boolean current_loc = true;
@@ -96,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.d(LOG_TAG, "onCreate");
         setContentView(activity_main);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -109,50 +118,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
         LocTextView = (TextView)findViewById(R.id.location);
 
-        //Location Manager is used to figure out which location provider needs to be used.
-        LocationManager locationManager=(LocationManager)getSystemService(LOCATION_SERVICE);
-        //Best location provider is decided by the criteria
-        Criteria criteria=new Criteria();
-        //location manager will take the best location from the criteria
-        locationManager.getBestProvider(criteria, true);
-
-        //once you know the name of the LocationProvider, you can call getLastKnownPosition()
-        // to find out where you were recently.
-
-        // Checking the permissions
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-        android.Manifest.permission.ACCESS_FINE_LOCATION)
-        == PackageManager.PERMISSION_GRANTED) {
-            mLocationPermissionGranted = true;
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
-
-        if(mLocationPermissionGranted) {
-            location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
-
-        }
-
-        Geocoder gcd=new Geocoder(this, Locale.getDefault());
-        List<Address> addresses;
-
-        try {
-            addresses=gcd.getFromLocation(location.getLatitude(),location.getLongitude(),1);
-                if(addresses.size()>0)
-                {
-                    cityname = addresses.get(0).getLocality().toString();
-                    //state = addresses.get(0).getAdminArea().toString();
-
-                    Log.d(LOG_TAG, "After back button pressed");
-                    LocTextView.setText(cityname);
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-
-            }
+        getLocation();
 
         LocTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,13 +141,6 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
             }
         });
 
-
-        if(current_loc==true && resJSONdata.isEmpty()) {
-            progress_bar.setVisibility(ProgressBar.VISIBLE);
-            progressBarIsShowing = true;
-            retrofit_response(location.getLatitude() + "," + location.getLongitude());
-        }
-
         // Retrieve location from saved instance state.
         if (savedInstanceState != null) {
             LocTextView.setText(savedInstanceState.getString(KEY_LOCATION));
@@ -191,43 +150,8 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 //            Log.d(LOG_TAG, "After rotating" + resJSONdata.get(1).getName().toString());
         }
 
-        resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        resRecyclerView.setHasFixedSize(true);
-
-        resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        resRecyclerView.setLayoutManager(resLayoutManager);
-
-        resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
-        resRecyclerView.setAdapter(resDataAdapter);
-
-        resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener(){
-
-            @Override
-            public void onItemClick(View itemView, int position) {
-
-//                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
-
-                Results res_results_card = resJSONdata.get(position);
-
-                ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
-
-                Intent i = new Intent(MainActivity.this, DetailActivity.class);
-                i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Bundle bundle = ActivityOptionsCompat
-                            .makeSceneTransitionAnimation(MainActivity.this)
-                            .toBundle();
-
-                    startActivity(i, bundle);
-                }else{
-                    startActivity(i);
-                }
-
-            }
-        });
-
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -246,6 +170,144 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 Log.i(LOG_TAG, "User Canceled the operation " );
             }
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+
+        Log.d(LOG_TAG, "onRequestPermissionsResult");
+        mLocationPermissionGranted = false;
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    mLocationPermissionGranted = true;
+                }
+            }
+        }
+        getLatLong();
+    }
+
+    public void getLocation(){
+
+        Log.d(LOG_TAG, "getLocation");
+
+        //Location Manager is used to figure out which location provider needs to be used.
+        locationManager=(LocationManager)getSystemService(LOCATION_SERVICE);
+        //Best location provider is decided by the criteria
+        criteria=new Criteria();
+        //location manager will take the best location from the criteria
+        locationManager.getBestProvider(criteria, true);
+
+        //once you know the name of the LocationProvider, you can call getLastKnownPosition()
+        // to find out where you were recently.
+
+        // Checking the permissions
+        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            mLocationPermissionGranted = true;
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
+
+    }
+
+    public void getLatLong(){
+
+        try {
+            if(mLocationPermissionGranted) {
+
+                Log.d(LOG_TAG, "mLocationPermissionGranted true");
+
+                location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
+
+                if(location!=null){
+
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+
+                    Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
+                }else{
+
+                    latitude = default_latitude;
+                    longitude = default_longitude;
+                }
+
+                if(current_loc==true && resJSONdata.isEmpty()) {
+
+                    Log.d(LOG_TAG, "calling retrofit...");
+                    Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
+                    progress_bar.setVisibility(ProgressBar.VISIBLE);
+                    progressBarIsShowing = true;
+                    retrofit_response(latitude + "," + longitude);
+                }
+
+                resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+                resRecyclerView.setHasFixedSize(true);
+
+                resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+                resRecyclerView.setLayoutManager(resLayoutManager);
+
+                resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
+                resRecyclerView.setAdapter(resDataAdapter);
+
+                resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener(){
+
+                    @Override
+                    public void onItemClick(View itemView, int position) {
+
+//                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
+
+                        Results res_results_card = resJSONdata.get(position);
+
+                        ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
+
+                        Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                        i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            Bundle bundle = ActivityOptionsCompat
+                                    .makeSceneTransitionAnimation(MainActivity.this)
+                                    .toBundle();
+
+                            startActivity(i, bundle);
+                        }else{
+                            startActivity(i);
+                        }
+
+                    }
+                });
+
+            }
+        } catch (SecurityException e)  {
+            Log.e("Exception: %s", e.getMessage());
+        }
+
+        Geocoder gcd=new Geocoder(this, Locale.getDefault());
+        List<Address> addresses;
+
+        try {
+            addresses=gcd.getFromLocation(latitude,longitude,1);
+            if(addresses.size()>0)
+            {
+                cityname = addresses.get(0).getLocality().toString();
+                //state = addresses.get(0).getAdminArea().toString();
+
+                Log.d(LOG_TAG, "After back button pressed");
+                LocTextView.setText(cityname);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+
     }
 
     @Override
@@ -295,6 +357,8 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     protected void onStart() {
         super.onStart();
 
+        Log.d(LOG_TAG, "onStart");
+
     }
 
     @Override
@@ -304,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
         Log.d(LOG_TAG, "on resume");
 
         if(current_loc==false)
-        LocTextView.setText(loc);
+            LocTextView.setText(loc);
     }
 
     @Override
@@ -366,14 +430,28 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 }
 
                 for(int i=0; i<res_data_count;i++){
-                    editor.putString("RESName"+"_" + i, resJSONdata.get(i).getName());
+
+                    if(resJSONdata.get(i).getName() != null) {
+                        editor.putString("RESName" + "_" + i, resJSONdata.get(i).getName());
+                    }else{
+                        editor.putString("RESName" + "_" + i, "name not found");
+                    }
 
                 }
                 for(int i=0; i<res_data_count;i++){
-                    editor.putString("RESVicinity"+"_" + i, resJSONdata.get(i).getVicinity());
+
+                    if(resJSONdata.get(i).getVicinity() != null) {
+                        editor.putString("RESVicinity" + "_" + i, resJSONdata.get(i).getVicinity());
+                    }else{
+                        editor.putString("RESVicinity" + "_" + i, "Address not found");
+                    }
                 }
                 for(int i=0; i<res_data_count;i++){
-                    editor.putBoolean("RESHours"+"_" + i, resJSONdata.get(i).getOpeningHours().getOpenNow());
+
+                    if(resJSONdata.get(i).getOpeningHours() != null){
+                        editor.putBoolean("RESHours"+"_" + i, resJSONdata.get(i).getOpeningHours().getOpenNow());
+                    }
+
                 }
 
                 editor.apply();

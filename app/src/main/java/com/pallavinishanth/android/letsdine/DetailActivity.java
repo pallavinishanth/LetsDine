@@ -70,8 +70,6 @@ public class DetailActivity extends AppCompatActivity {
     final String RES_DETAIL_API = "https://maps.googleapis.com/maps/";
     private static DetailResult detail_result = new DetailResult();
 
-    private static String res_name;
-
     TextView hours_view;
     ImageView res_Photo;
     TextView website_view;
@@ -315,15 +313,15 @@ public class DetailActivity extends AppCompatActivity {
 
     }
 
-    public Boolean ResMarkedFav(String res_name){
+    public Boolean ResMarkedFav(String place_id){
 
-        Log.d(LOG_TAG, "ResMarkedFav "+ res_name);
+        Log.d(LOG_TAG, "ResMarkedFav "+ place_id);
 
         Cursor cursor;
 
         cursor = getContentResolver().query(ResContract.ResEntry.CONTENT_URI,
-                new String[] {ResContract.ResEntry.COLUMN_RES_NAME},
-                ResContract.ResEntry.COLUMN_RES_NAME + "=" + "'" +res_name + "'",
+                new String[] {ResContract.ResEntry.COLUMN_PLACE_ID},
+                ResContract.ResEntry.COLUMN_PLACE_ID + "=" + "'" +place_id + "'",
                 null, null, null);
 
         if(cursor.getCount()==0)
@@ -360,13 +358,13 @@ public class DetailActivity extends AppCompatActivity {
 
     }
 
-    public boolean DeleteFavResData(String res_name){
+    public boolean DeleteFavResData(String placeid){
 
         int no_rows_deleted = getContentResolver()
-                .delete(ResContract.ResEntry.buildFavResUri(res_name),
-                        ResContract.ResEntry.COLUMN_RES_NAME + "=" + "'" +res_name + "'", null);
+                .delete(ResContract.ResEntry.buildFavResUri(placeid),
+                        ResContract.ResEntry.COLUMN_PLACE_ID + "=" + "'" +placeid + "'", null);
 
-        Log.v(LOG_TAG, "Deleted Movie Data "+ res_name + "rows " + no_rows_deleted);
+        Log.v(LOG_TAG, "Deleted Movie Data "+ placeid + "rows " + no_rows_deleted);
 
         if(no_rows_deleted > 0){
 
@@ -391,7 +389,7 @@ public class DetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void retrofit_detail_response(String place_ID){
+    private void retrofit_detail_response(final String place_ID){
 
         Retrofit resDetailRetrofit = new Retrofit.Builder()
                 .baseUrl(RES_DETAIL_API)
@@ -548,7 +546,7 @@ public class DetailActivity extends AppCompatActivity {
                     }
                 });
 
-                markedFav = ResMarkedFav(detail_result.getname());
+                markedFav = ResMarkedFav(placeID);
 
                 if(markedFav){
 
@@ -566,7 +564,7 @@ public class DetailActivity extends AppCompatActivity {
 
                         if(markedFav){
 
-                            delete_result = DeleteFavResData(detail_result.getname());
+                            delete_result = DeleteFavResData(placeID);
 
                             if(delete_result){
                                 markedFav = false;
@@ -600,7 +598,6 @@ public class DetailActivity extends AppCompatActivity {
                             }
 
                         }
-
 
                     }
                 });

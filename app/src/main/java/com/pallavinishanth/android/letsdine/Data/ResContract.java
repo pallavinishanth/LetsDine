@@ -41,8 +41,8 @@ public final class ResContract {
 
         public static final String COLUMN_RES_VICINITY = "res_vicinity";
 
-        public static Uri buildFavResUri(String name) {
-            return CONTENT_URI.buildUpon().appendEncodedPath(name).build();
+        public static Uri buildFavResUri(String placeid) {
+            return CONTENT_URI.buildUpon().appendEncodedPath(placeid).build();
         }
 
         public static String getFavResName(Uri uri) {
