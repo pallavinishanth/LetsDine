@@ -9,7 +9,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pallavinishanth.android.letsdine.Data.ResContract;
@@ -29,7 +28,6 @@ public class FavoriteActivity extends AppCompatActivity {
     String[] res_names;
     String[] res_address;
     static String[] PlaceID;
-    TextView fav_textview;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -37,32 +35,27 @@ public class FavoriteActivity extends AppCompatActivity {
 
         setContentView(R.layout.favorite_layout);
 
-        fav_textview = (TextView) findViewById(R.id.fav_heading);
-
-        if(res_names == null && res_address == null)
-            fav_textview.setText("No Favorites to show");
-
         favRecyclerView = (RecyclerView) findViewById(R.id.fav_recycler_view);
         favRecyclerView.setHasFixedSize(true);
         favLayoutManager = new LinearLayoutManager(FavoriteActivity.this,
                 LinearLayoutManager.VERTICAL, false);
         favRecyclerView.setLayoutManager(favLayoutManager);
-
-        favAdapter = new FavoriteAdapter(getBaseContext(), res_names, res_address);
-        favRecyclerView.setAdapter(favAdapter);
-
-        favAdapter.setOnItemClickListener(new FavoriteAdapter.OnItemClickListener(){
-
-            @Override
-            public void onItemClick(View itemView, int position) {
-
-//                Toast.makeText(FavoriteActivity.this, "Fav Restaurant clicked", Toast.LENGTH_SHORT).show();
-
-                Intent i = new Intent(FavoriteActivity.this, DetailActivity.class);
-                i.putExtra(DetailActivity.PLACE_ID, PlaceID[position]);
-                startActivity(i);
-            }
-        });
+//
+//        favAdapter = new FavoriteAdapter(getBaseContext(), res_names, res_address);
+//        favRecyclerView.setAdapter(favAdapter);
+//
+//        favAdapter.setOnItemClickListener(new FavoriteAdapter.OnItemClickListener(){
+//
+//            @Override
+//            public void onItemClick(View itemView, int position) {
+//
+////                Toast.makeText(FavoriteActivity.this, "Fav Restaurant clicked", Toast.LENGTH_SHORT).show();
+//
+//                Intent i = new Intent(FavoriteActivity.this, DetailActivity.class);
+//                i.putExtra(DetailActivity.PLACE_ID, PlaceID[position]);
+//                startActivity(i);
+//            }
+//        });
     }
 
     @Override
@@ -106,6 +99,19 @@ public class FavoriteActivity extends AppCompatActivity {
 
             favAdapter = new FavoriteAdapter(getBaseContext(), res_names, res_address);
             favRecyclerView.setAdapter(favAdapter);
+
+            favAdapter.setOnItemClickListener(new FavoriteAdapter.OnItemClickListener(){
+
+                @Override
+                public void onItemClick(View itemView, int position) {
+
+//                Toast.makeText(FavoriteActivity.this, "Fav Restaurant clicked", Toast.LENGTH_SHORT).show();
+
+                    Intent i = new Intent(FavoriteActivity.this, DetailActivity.class);
+                    i.putExtra(DetailActivity.PLACE_ID, PlaceID[position]);
+                    startActivity(i);
+                }
+            });
         } else{
 
             Toast.makeText(FavoriteActivity.this, "No Restaurants in Favorite List", Toast.LENGTH_SHORT).show();
