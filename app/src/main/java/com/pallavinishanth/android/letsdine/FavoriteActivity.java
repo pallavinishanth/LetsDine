@@ -40,22 +40,7 @@ public class FavoriteActivity extends AppCompatActivity {
         favLayoutManager = new LinearLayoutManager(FavoriteActivity.this,
                 LinearLayoutManager.VERTICAL, false);
         favRecyclerView.setLayoutManager(favLayoutManager);
-//
-//        favAdapter = new FavoriteAdapter(getBaseContext(), res_names, res_address);
-//        favRecyclerView.setAdapter(favAdapter);
-//
-//        favAdapter.setOnItemClickListener(new FavoriteAdapter.OnItemClickListener(){
-//
-//            @Override
-//            public void onItemClick(View itemView, int position) {
-//
-////                Toast.makeText(FavoriteActivity.this, "Fav Restaurant clicked", Toast.LENGTH_SHORT).show();
-//
-//                Intent i = new Intent(FavoriteActivity.this, DetailActivity.class);
-//                i.putExtra(DetailActivity.PLACE_ID, PlaceID[position]);
-//                startActivity(i);
-//            }
-//        });
+
     }
 
     @Override
