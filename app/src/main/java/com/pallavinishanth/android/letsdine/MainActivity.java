@@ -75,8 +75,8 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     public LocationManager locationManager;
     Criteria criteria;
 
-    public double default_latitude = 40.7128;
-    public double default_longitude = 74.0059;
+    public double default_latitude = 42.359799;
+    public double default_longitude = -71.054460;
 
     String state;
     static boolean current_loc = true;
@@ -239,6 +239,25 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                     longitude = default_longitude;
                 }
 
+                Geocoder gcd=new Geocoder(this, Locale.getDefault());
+                List<Address> addresses;
+
+                try {
+                    addresses=gcd.getFromLocation(latitude,longitude,1);
+                    if(addresses.size()>0)
+                    {
+                        cityname = addresses.get(0).getLocality().toString();
+                        //state = addresses.get(0).getAdminArea().toString();
+
+                        Log.d(LOG_TAG, "After back button pressed");
+                        LocTextView.setText(cityname);
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+
+                }
+
                 if(current_loc==true && resJSONdata.isEmpty()) {
 
                     Log.d(LOG_TAG, "calling retrofit...");
@@ -284,28 +303,74 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                     }
                 });
 
+            }else{
+
+                Geocoder gcd=new Geocoder(this, Locale.getDefault());
+                List<Address> addresses;
+
+                try {
+                    addresses=gcd.getFromLocation(default_latitude,default_longitude,1);
+                    if(addresses.size()>0)
+                    {
+                        cityname = addresses.get(0).getLocality().toString();
+                        //state = addresses.get(0).getAdminArea().toString();
+
+                        Log.d(LOG_TAG, "After back button pressed");
+                        LocTextView.setText(cityname);
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+
+                }
+
+                if(current_loc==true && resJSONdata.isEmpty()) {
+
+                    Log.d(LOG_TAG, "calling retrofit...");
+                    Log.d(LOG_TAG, "latitude : " + default_longitude + "longitude : " + default_longitude);
+                    progress_bar.setVisibility(ProgressBar.VISIBLE);
+                    progressBarIsShowing = true;
+                    retrofit_response(default_latitude + "," + default_longitude);
+                }
+
+                resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+                resRecyclerView.setHasFixedSize(true);
+
+                resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+                resRecyclerView.setLayoutManager(resLayoutManager);
+
+                resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
+                resRecyclerView.setAdapter(resDataAdapter);
+
+                resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener(){
+
+                    @Override
+                    public void onItemClick(View itemView, int position) {
+
+//                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
+
+                        Results res_results_card = resJSONdata.get(position);
+
+                        ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
+
+                        Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                        i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            Bundle bundle = ActivityOptionsCompat
+                                    .makeSceneTransitionAnimation(MainActivity.this)
+                                    .toBundle();
+
+                            startActivity(i, bundle);
+                        }else{
+                            startActivity(i);
+                        }
+
+                    }
+                });
             }
         } catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage());
-        }
-
-        Geocoder gcd=new Geocoder(this, Locale.getDefault());
-        List<Address> addresses;
-
-        try {
-            addresses=gcd.getFromLocation(latitude,longitude,1);
-            if(addresses.size()>0)
-            {
-                cityname = addresses.get(0).getLocality().toString();
-                //state = addresses.get(0).getAdminArea().toString();
-
-                Log.d(LOG_TAG, "After back button pressed");
-                LocTextView.setText(cityname);
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-
         }
 
     }
