@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,7 +20,8 @@ import com.pallavinishanth.android.letsdine.Data.ResContract;
  * Created by PallaviNishanth on 9/8/17.
  */
 
-public class FavoriteActivity extends AppCompatActivity {
+public class FavoriteActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final String LOG_TAG = FavoriteActivity.class.getSimpleName();
 
@@ -35,6 +39,8 @@ public class FavoriteActivity extends AppCompatActivity {
 
         setContentView(R.layout.favorite_layout);
 
+        getSupportLoaderManager().initLoader(0, null, this);
+
         favRecyclerView = (RecyclerView) findViewById(R.id.fav_recycler_view);
         favRecyclerView.setHasFixedSize(true);
         favLayoutManager = new LinearLayoutManager(FavoriteActivity.this,
@@ -46,41 +52,39 @@ public class FavoriteActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        getFavRestaurants();
     }
 
-    public void getFavRestaurants() {
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this, ResContract.ResEntry.CONTENT_URI, null, null, null, null);
+    }
 
-        Log.v(LOG_TAG, "Get favorite Restaurants");
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
-        Cursor favrescursor;
+        Log.d(LOG_TAG, "onLoadFinished....");
 
-        favrescursor = getContentResolver().
-                query(ResContract.ResEntry.CONTENT_URI, null, null, null, null, null);
+        if(cursor !=null && cursor.getCount() > 0){
 
-        if (favrescursor.getCount() != 0) {
-
-            Log.v(LOG_TAG, "Fav movies DB has items" + favrescursor.getCount());
-
-            favrescursor.moveToFirst();
+            cursor.moveToFirst();
             int i = 0;
 
-            res_names = new String[favrescursor.getCount()];
-            res_address = new String[favrescursor.getCount()];
-            PlaceID = new String[favrescursor.getCount()];
+            res_names = new String[cursor.getCount()];
+            res_address = new String[cursor.getCount()];
+            PlaceID = new String[cursor.getCount()];
 
             do {
 
-                res_names[i] = favrescursor.
-                        getString(favrescursor.getColumnIndex(ResContract.ResEntry.COLUMN_RES_NAME));
-                res_address[i] = favrescursor.
-                        getString(favrescursor.getColumnIndex(ResContract.ResEntry.COLUMN_RES_VICINITY));
-                PlaceID[i] = favrescursor.
-                        getString(favrescursor.getColumnIndex(ResContract.ResEntry.COLUMN_PLACE_ID));
+                res_names[i] = cursor.
+                        getString(cursor.getColumnIndex(ResContract.ResEntry.COLUMN_RES_NAME));
+                res_address[i] = cursor.
+                        getString(cursor.getColumnIndex(ResContract.ResEntry.COLUMN_RES_VICINITY));
+                PlaceID[i] = cursor.
+                        getString(cursor.getColumnIndex(ResContract.ResEntry.COLUMN_PLACE_ID));
                 i++;
 
-            } while (favrescursor.moveToNext());
-            favrescursor.close();
+            } while (cursor.moveToNext());
+            cursor.close();
 
             favAdapter = new FavoriteAdapter(getBaseContext(), res_names, res_address);
             favRecyclerView.setAdapter(favAdapter);
@@ -100,7 +104,14 @@ public class FavoriteActivity extends AppCompatActivity {
         } else {
 
             Toast.makeText(FavoriteActivity.this, R.string.no_fav, Toast.LENGTH_SHORT).show();
-            favrescursor.close();
+            cursor.close();
         }
     }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
+        favRecyclerView.setAdapter(null);
+    }
+
 }
