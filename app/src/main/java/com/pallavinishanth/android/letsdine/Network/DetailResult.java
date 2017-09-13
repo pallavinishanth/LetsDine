@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Created by PallaviNishanth on 7/26/17.
  */
 
-public class DetailResult implements Parcelable{
+public class DetailResult implements Parcelable {
 
     private String formatted_address;
 
@@ -27,32 +27,32 @@ public class DetailResult implements Parcelable{
 
     private ArrayList<DetailPhotos> photos = new ArrayList<DetailPhotos>();
 
-    public String getAddress(){
+    public String getAddress() {
 
         return formatted_address;
     }
 
-    public void setAddress(String address){
+    public void setAddress(String address) {
 
-         this.formatted_address = address;
+        this.formatted_address = address;
     }
 
-    public String getPhoneNum(){
+    public String getPhoneNum() {
 
         return international_phone_number;
     }
 
-    public void setPhoneNum(String PhNo){
+    public void setPhoneNum(String PhNo) {
 
         this.international_phone_number = PhNo;
     }
 
-    public String getname(){
+    public String getname() {
 
         return name;
     }
 
-    public void setname(String name){
+    public void setname(String name) {
 
         this.name = name;
     }
@@ -71,32 +71,32 @@ public class DetailResult implements Parcelable{
         this.opening_hours = openingHours;
     }
 
-    public String getWebsite(){
+    public String getWebsite() {
 
         return website;
     }
 
-    public void setWebsite(String website){
+    public void setWebsite(String website) {
 
         this.website = website;
     }
 
-    public String geticon(){
+    public String geticon() {
 
         return icon;
     }
 
-    public void seticon(String icon){
+    public void seticon(String icon) {
 
         this.icon = icon;
     }
 
-    public ArrayList<Reviews> getReviews(){
+    public ArrayList<Reviews> getReviews() {
 
         return reviews;
     }
 
-    public void setReviews(ArrayList<Reviews> reviews){
+    public void setReviews(ArrayList<Reviews> reviews) {
 
         this.reviews = reviews;
     }
@@ -115,7 +115,7 @@ public class DetailResult implements Parcelable{
         this.photos = photos;
     }
 
-    private DetailResult(Parcel in){
+    private DetailResult(Parcel in) {
 
         formatted_address = in.readString();
         international_phone_number = in.readString();
@@ -131,7 +131,7 @@ public class DetailResult implements Parcelable{
         in.readTypedList(photos, DetailPhotos.CREATOR);
     }
 
-    public DetailResult(){
+    public DetailResult() {
 
     }
 
@@ -153,7 +153,7 @@ public class DetailResult implements Parcelable{
         return 0;
     }
 
-    public static final Parcelable.Creator<DetailResult> CREATOR = new Parcelable.Creator<DetailResult>(){
+    public static final Parcelable.Creator<DetailResult> CREATOR = new Parcelable.Creator<DetailResult>() {
 
         @Override
         public DetailResult createFromParcel(Parcel parcel) {

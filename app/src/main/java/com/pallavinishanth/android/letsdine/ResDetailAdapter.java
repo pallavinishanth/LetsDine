@@ -22,7 +22,7 @@ public class ResDetailAdapter extends RecyclerView.Adapter<ResDetailAdapter.View
     DetailResult detailResult;
     private final String LOG_TAG = ResDetailAdapter.class.getSimpleName();
 
-    public ResDetailAdapter(Context context, DetailResult detail_result){
+    public ResDetailAdapter(Context context, DetailResult detail_result) {
 
         this.rContext = context;
         this.detailResult = detail_result;
@@ -32,75 +32,53 @@ public class ResDetailAdapter extends RecyclerView.Adapter<ResDetailAdapter.View
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-        if(detailResult.getWebsite()!=null){
+        if (detailResult.getWebsite() != null) {
 
             Log.v(LOG_TAG, "Place website " + detailResult.getWebsite());
             holder.website_view.setText(detailResult.getWebsite());
 
-//            holder.website_view.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//
-//                    Intent browserIntent = new Intent(Intent.ACTION_VIEW);
-//                    browserIntent.setData(Uri.parse(detailResult.getWebsite()));
-//                    startActivity(browserIntent);
-//                }
-//            });
-
-        }else{
-            holder.website_view.setText("URL not found");
+        } else {
+            holder.website_view.setText(R.string.url_not_found);
         }
 
-        if(detailResult.getPhoneNum()!=null){
+        if (detailResult.getPhoneNum() != null) {
 
             Log.v(LOG_TAG, detailResult.getPhoneNum());
             holder.phoneview.setText(detailResult.getPhoneNum());
 
-//            holder.phoneicon.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//
-////                            Toast.makeText(DetailActivity.this, "Phone Icon clicked",
-////                                    Toast.LENGTH_SHORT).show();
-//
-//                    Intent callIntent = new Intent(Intent.ACTION_DIAL);
-//                    callIntent.setData(Uri.parse("tel:"+ detailResult.getPhoneNum()));
-//                    startActivity(callIntent);
-//                }
-//            });
-        }else{
+        } else {
 
-            holder.phoneview.setText("Phone Number Not Found");
+            holder.phoneview.setText(R.string.phoneNum_not_found);
         }
 
-        if(detailResult.getDetailOpeningHours()!=null){
+        if (detailResult.getDetailOpeningHours() != null) {
 
-            for(int i=0; i<7; i++){
+            for (int i = 0; i < 7; i++) {
                 holder.hours_view.append(detailResult.getDetailOpeningHours().getweekhours()[i]);
                 holder.hours_view.append("\n");
                 Log.v(LOG_TAG, "hours " + (detailResult.getDetailOpeningHours().getweekhours()[i]));
             }
 
-        }else{
-            holder.hours_view.setText("Hours not found");
+        } else {
+            holder.hours_view.setText(R.string.hours_not_found);
         }
 
-        if(detailResult.getAddress()!=null){
+        if (detailResult.getAddress() != null) {
 
             Log.v(LOG_TAG, detailResult.getAddress());
             holder.address.setText(detailResult.getAddress());
-        }else{
-            holder.address.setText("Address not found");
+        } else {
+            holder.address.setText(R.string.address_not_found);
         }
 
-        if(detailResult.getname() != null){
+        if (detailResult.getname() != null) {
 
-            holder.collapsingToolbar.setTitle(detailResult.getname() );
+            holder.collapsingToolbar.setTitle(detailResult.getname());
             holder.collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
             holder.collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
 
-        }else{
-            holder.collapsingToolbar.setTitle("Restaurant name not found");
+        } else {
+            holder.collapsingToolbar.setTitle(rContext.getString(R.string.name_not_found));
         }
 
     }

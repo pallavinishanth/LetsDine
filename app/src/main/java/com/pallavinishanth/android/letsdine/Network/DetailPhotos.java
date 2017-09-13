@@ -78,7 +78,7 @@ public class DetailPhotos implements Parcelable {
         return 0;
     }
 
-    private DetailPhotos(Parcel in){
+    private DetailPhotos(Parcel in) {
         photo_reference = in.readString();
         height = in.readInt();
         width = in.readInt();
@@ -97,7 +97,7 @@ public class DetailPhotos implements Parcelable {
 
     }
 
-    public static final Creator<DetailPhotos> CREATOR = new Creator<DetailPhotos>(){
+    public static final Creator<DetailPhotos> CREATOR = new Creator<DetailPhotos>() {
 
         @Override
         public DetailPhotos createFromParcel(Parcel parcel) {

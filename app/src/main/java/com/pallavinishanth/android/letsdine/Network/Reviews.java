@@ -7,38 +7,38 @@ import android.os.Parcelable;
  * Created by PallaviNishanth on 7/26/17.
  */
 
-public class Reviews implements Parcelable{
+public class Reviews implements Parcelable {
 
     private String author_name;
     private int rating;
     private String text;
 
-    public String getAuthor_name(){
+    public String getAuthor_name() {
 
         return author_name;
     }
 
-    public void setAuthor_name(String authorName){
+    public void setAuthor_name(String authorName) {
 
         this.author_name = authorName;
     }
 
-    public int getRating(){
+    public int getRating() {
 
         return rating;
     }
 
-    public void setRating(int rating){
+    public void setRating(int rating) {
 
         this.rating = rating;
     }
 
-    public String getText(){
+    public String getText() {
 
         return text;
     }
 
-    public void setText(String text){
+    public void setText(String text) {
 
         this.text = text;
     }
@@ -48,7 +48,7 @@ public class Reviews implements Parcelable{
         return 0;
     }
 
-    private Reviews(Parcel in){
+    private Reviews(Parcel in) {
 
         author_name = in.readString();
         rating = in.readInt();
@@ -64,7 +64,7 @@ public class Reviews implements Parcelable{
         parcel.writeString(text);
     }
 
-    public static final Parcelable.Creator<Reviews> CREATOR = new Parcelable.Creator<Reviews>(){
+    public static final Parcelable.Creator<Reviews> CREATOR = new Parcelable.Creator<Reviews>() {
 
         @Override
         public Reviews createFromParcel(Parcel parcel) {

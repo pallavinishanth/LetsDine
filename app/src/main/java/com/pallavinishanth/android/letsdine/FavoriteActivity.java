@@ -58,7 +58,7 @@ public class FavoriteActivity extends AppCompatActivity {
         favrescursor = getContentResolver().
                 query(ResContract.ResEntry.CONTENT_URI, null, null, null, null, null);
 
-        if(favrescursor.getCount()!=0) {
+        if (favrescursor.getCount() != 0) {
 
             Log.v(LOG_TAG, "Fav movies DB has items" + favrescursor.getCount());
 
@@ -69,7 +69,7 @@ public class FavoriteActivity extends AppCompatActivity {
             res_address = new String[favrescursor.getCount()];
             PlaceID = new String[favrescursor.getCount()];
 
-            do{
+            do {
 
                 res_names[i] = favrescursor.
                         getString(favrescursor.getColumnIndex(ResContract.ResEntry.COLUMN_RES_NAME));
@@ -79,13 +79,13 @@ public class FavoriteActivity extends AppCompatActivity {
                         getString(favrescursor.getColumnIndex(ResContract.ResEntry.COLUMN_PLACE_ID));
                 i++;
 
-            }while(favrescursor.moveToNext());
+            } while (favrescursor.moveToNext());
             favrescursor.close();
 
             favAdapter = new FavoriteAdapter(getBaseContext(), res_names, res_address);
             favRecyclerView.setAdapter(favAdapter);
 
-            favAdapter.setOnItemClickListener(new FavoriteAdapter.OnItemClickListener(){
+            favAdapter.setOnItemClickListener(new FavoriteAdapter.OnItemClickListener() {
 
                 @Override
                 public void onItemClick(View itemView, int position) {
@@ -97,9 +97,9 @@ public class FavoriteActivity extends AppCompatActivity {
                     startActivity(i);
                 }
             });
-        } else{
+        } else {
 
-            Toast.makeText(FavoriteActivity.this, "No Restaurants in Favorite List", Toast.LENGTH_SHORT).show();
+            Toast.makeText(FavoriteActivity.this, R.string.no_fav, Toast.LENGTH_SHORT).show();
             favrescursor.close();
         }
     }

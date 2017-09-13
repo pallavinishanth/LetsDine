@@ -28,7 +28,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
     }
 
 
-    public FavoriteAdapter(Context context, String[] res_name, String[] res_add){
+    public FavoriteAdapter(Context context, String[] res_name, String[] res_add) {
 
         this.rContext = context;
         this.resName = res_name;
@@ -74,13 +74,13 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
             restextview = (TextView) view.findViewById(R.id.fav_res_name);
             resaddtextview = (TextView) view.findViewById(R.id.fav_res_add);
 
-            view.setOnClickListener(new View.OnClickListener(){
+            view.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View view) {
 
                     int position = getAdapterPosition();
-                    if(position!= RecyclerView.NO_POSITION) {
+                    if (position != RecyclerView.NO_POSITION) {
                         listener.onItemClick(view, position);
                     }
                 }

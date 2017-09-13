@@ -128,13 +128,13 @@ public class DetailActivity extends AppCompatActivity {
                 LinearLayoutManager.VERTICAL, false);
         reviewRecyclerView.setLayoutManager(reviewLayoutManager);
 
-        if(savedInstanceState !=null){
+        if (savedInstanceState != null) {
 
             markedFav = savedInstanceState.getBoolean("M_marked");
 
             detail_result = savedInstanceState.getParcelable("DETAIL_RESULT");
 
-            if(detail_result.getWebsite()!=null){
+            if (detail_result.getWebsite() != null) {
 
                 Log.v(LOG_TAG, "Place website " + detail_result.getWebsite());
                 website_view.setText(detail_result.getWebsite());
@@ -150,33 +150,12 @@ public class DetailActivity extends AppCompatActivity {
                     }
                 });
 
-            }else{
-                website_view.setText("URL not found");
-                website_view.setContentDescription("URL not found");
+            } else {
+                website_view.setText(R.string.url_not_found);
+                website_view.setContentDescription(getString(R.string.url_not_found));
             }
 
-            if(detail_result.getWebsite()!=null){
-
-                Log.v(LOG_TAG, "Place website " + detail_result.getWebsite());
-                website_view.setText(detail_result.getWebsite());
-                website_view.setContentDescription(detail_result.getWebsite());
-
-                website_view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW);
-                        browserIntent.setData(Uri.parse(detail_result.getWebsite()));
-                        startActivity(browserIntent);
-                    }
-                });
-
-            }else{
-                website_view.setText("URL not found");
-                website_view.setContentDescription("URL not found");
-            }
-
-            if(detail_result.getPhoneNum()!=null){
+            if (detail_result.getPhoneNum() != null) {
 
                 Log.v(LOG_TAG, detail_result.getPhoneNum());
                 phoneview.setText(detail_result.getPhoneNum());
@@ -187,19 +166,19 @@ public class DetailActivity extends AppCompatActivity {
                     public void onClick(View view) {
 
                         Intent callIntent = new Intent(Intent.ACTION_DIAL);
-                        callIntent.setData(Uri.parse("tel:"+ detail_result.getPhoneNum()));
+                        callIntent.setData(Uri.parse("tel:" + detail_result.getPhoneNum()));
                         startActivity(callIntent);
                     }
                 });
-            }else{
+            } else {
 
-                phoneview.setText("Phone Number Not Found");
-                phoneview.setContentDescription("Phone Number Not Found");
+                phoneview.setText(R.string.phoneNum_not_found);
+                phoneview.setContentDescription(getString(R.string.phoneNum_not_found));
             }
 
-            if(detail_result.getDetailOpeningHours()!=null){
+            if (detail_result.getDetailOpeningHours() != null) {
 
-                for(int i=0; i<7; i++){
+                for (int i = 0; i < 7; i++) {
                     hours_view.append(detail_result.getDetailOpeningHours().getweekhours()[i]);
                     hours_view.setContentDescription(detail_result.getDetailOpeningHours().getweekhours()[0]
                             + detail_result.getDetailOpeningHours().getweekhours()[1]
@@ -212,56 +191,55 @@ public class DetailActivity extends AppCompatActivity {
                     Log.v(LOG_TAG, "hours " + (detail_result.getDetailOpeningHours().getweekhours()[i]));
                 }
 
-            }else{
-                hours_view.setText("Hours not found");
-                hours_view.setContentDescription("Hours not found");
+            } else {
+                hours_view.setText(R.string.hours_not_found);
+                hours_view.setContentDescription(getString(R.string.hours_not_found));
             }
 
-            if(detail_result.getAddress()!=null){
+            if (detail_result.getAddress() != null) {
 
                 Log.v(LOG_TAG, detail_result.getAddress());
                 address.setText(detail_result.getAddress());
                 address.setContentDescription(detail_result.getAddress());
-            }else{
-                address.setText("Address not found");
-                address.setContentDescription("Address not found");
+            } else {
+                address.setText(R.string.address_not_found);
+                address.setContentDescription(getString(R.string.address_not_found));
             }
 
             CollapsingToolbarLayout collapsingToolbar =
                     (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 
-            if(detail_result.getname() != null){
+            if (detail_result.getname() != null) {
 
-                collapsingToolbar.setTitle(detail_result.getname() );
+                collapsingToolbar.setTitle(detail_result.getname());
                 collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
                 collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
 
-            }else{
-                collapsingToolbar.setTitle("Restaurant name not found");
+            } else {
+                collapsingToolbar.setTitle(getString(R.string.name_not_found));
             }
 
-
-            if(!detail_result.getPhotos().isEmpty()){
+            if (!detail_result.getPhotos().isEmpty()) {
 
                 Log.v(LOG_TAG, detail_result.getPhotos().get(0).getPhotoReference());
                 Log.v(LOG_TAG, String.format("size = %d", detail_result.getPhotos().size()));
                 photoslist = detail_result.getPhotos();
 
                 Glide.with(getBaseContext()).load("https://maps.googleapis.com/maps/api/place/photo?maxheight=380&photoreference="
-                        +photoslist.get(0).getPhotoReference()
-                        +"&key=" + BuildConfig.GOOGLE_PLACES_API_KEY).centerCrop().into(backdrop);
+                        + photoslist.get(0).getPhotoReference()
+                        + "&key=" + BuildConfig.GOOGLE_PLACES_API_KEY).centerCrop().into(backdrop);
 
                 resPhotoAdapter = new ResPhotoAdapter(getBaseContext(), photoslist);
                 photoRecyclerView.setAdapter(resPhotoAdapter);
-            }else{
+            } else {
 
 //                    Glide.with(getBaseContext()).load(detail_result.geticon()).centerCrop().into(backdrop);
-                photoHeading.setText("PHOTOS NOT FOUND");
-                photoHeading.setContentDescription("PHOTOS NOT FOUND");
+                photoHeading.setText(R.string.photos_not_found);
+                photoHeading.setContentDescription(getString(R.string.photos_not_found));
 
             }
 
-            if(!detail_result.getReviews().isEmpty()){
+            if (!detail_result.getReviews().isEmpty()) {
                 Log.v(LOG_TAG, detail_result.getReviews().get(0).getAuthor_name());
                 Log.v(LOG_TAG, detail_result.getReviews().get(0).getText());
                 Log.v(LOG_TAG, String.format("Review Rating = %d", detail_result.getReviews().get(0).getRating()));
@@ -270,9 +248,9 @@ public class DetailActivity extends AppCompatActivity {
                 resReviewAdapter = new ResReviewsAdapter(getBaseContext(), reviewslist);
                 reviewRecyclerView.setAdapter(resReviewAdapter);
 
-            }else{
-                reviewHeading.setText("REVIEWS NOT FOUND");
-                reviewHeading.setContentDescription("REVIEWS NOT FOUND");
+            } else {
+                reviewHeading.setText(R.string.reviews_not_found);
+                reviewHeading.setContentDescription(getString(R.string.reviews_not_found));
             }
 
             mapImage.setOnClickListener(new View.OnClickListener() {
@@ -282,14 +260,14 @@ public class DetailActivity extends AppCompatActivity {
 //                        Toast.makeText(DetailActivity.this, "Maps clicked",
 //                                Toast.LENGTH_SHORT).show();
 
-                    Uri gmmIntentUri = Uri.parse("google.navigation:q="+ detail_result.getAddress());
+                    Uri gmmIntentUri = Uri.parse("google.navigation:q=" + detail_result.getAddress());
                     Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                     mapIntent.setPackage("com.google.android.apps.maps");
                     startActivity(mapIntent);
                 }
             });
 
-        }else{
+        } else {
 
             retrofit_detail_response(placeID);
         }
@@ -313,24 +291,24 @@ public class DetailActivity extends AppCompatActivity {
 
     }
 
-    public Boolean ResMarkedFav(String place_id){
+    public Boolean ResMarkedFav(String place_id) {
 
-        Log.d(LOG_TAG, "ResMarkedFav "+ place_id);
+        Log.d(LOG_TAG, "ResMarkedFav " + place_id);
 
         Cursor cursor;
 
         cursor = getContentResolver().query(ResContract.ResEntry.CONTENT_URI,
-                new String[] {ResContract.ResEntry.COLUMN_PLACE_ID},
-                ResContract.ResEntry.COLUMN_PLACE_ID + "=" + "'" +place_id + "'",
+                new String[]{ResContract.ResEntry.COLUMN_PLACE_ID},
+                ResContract.ResEntry.COLUMN_PLACE_ID + "=" + "'" + place_id + "'",
                 null, null, null);
 
-        if(cursor.getCount()==0)
+        if (cursor.getCount() == 0)
             return false;
         else
             return true;
     }
 
-    public boolean insertFavMovieData(String place_id, String name, String vicinity){
+    public boolean insertFavMovieData(String place_id, String name, String vicinity) {
 
 
         ContentValues mvalues = new ContentValues();
@@ -346,31 +324,31 @@ public class DetailActivity extends AppCompatActivity {
 
         Long result_id = ContentUris.parseId(insertedUri);
 
-        if(result_id>0 && result_id!=-1){
-            Log.v(LOG_TAG, "Insertion Successfuly "+ name);
+        if (result_id > 0 && result_id != -1) {
+            Log.v(LOG_TAG, "Insertion Successfuly " + name);
             return true;
 
-        }else {
+        } else {
 
-            Log.v(LOG_TAG, "Insertion failed "+ name);
+            Log.v(LOG_TAG, "Insertion failed " + name);
             return false;
         }
 
     }
 
-    public boolean DeleteFavResData(String placeid){
+    public boolean DeleteFavResData(String placeid) {
 
         int no_rows_deleted = getContentResolver()
                 .delete(ResContract.ResEntry.buildFavResUri(placeid),
-                        ResContract.ResEntry.COLUMN_PLACE_ID + "=" + "'" +placeid + "'", null);
+                        ResContract.ResEntry.COLUMN_PLACE_ID + "=" + "'" + placeid + "'", null);
 
-        Log.v(LOG_TAG, "Deleted Movie Data "+ placeid + "rows " + no_rows_deleted);
+        Log.v(LOG_TAG, "Deleted Movie Data " + placeid + "rows " + no_rows_deleted);
 
-        if(no_rows_deleted > 0){
+        if (no_rows_deleted > 0) {
 
             return true;
 
-        }else {
+        } else {
 
             return false;
         }
@@ -389,7 +367,7 @@ public class DetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void retrofit_detail_response(final String place_ID){
+    private void retrofit_detail_response(final String place_ID) {
 
         Retrofit resDetailRetrofit = new Retrofit.Builder()
                 .baseUrl(RES_DETAIL_API)
@@ -409,7 +387,7 @@ public class DetailActivity extends AppCompatActivity {
 
                 detail_result = response.body().getResults();
 
-                if(detail_result.getWebsite()!=null){
+                if (detail_result.getWebsite() != null) {
 
                     Log.v(LOG_TAG, "Place website " + detail_result.getWebsite());
                     website_view.setText(detail_result.getWebsite());
@@ -425,12 +403,12 @@ public class DetailActivity extends AppCompatActivity {
                         }
                     });
 
-                }else{
-                    website_view.setText("URL not found");
-                    website_view.setContentDescription("URL not found");
+                } else {
+                    website_view.setText(R.string.url_not_found);
+                    website_view.setContentDescription(getString(R.string.url_not_found));
                 }
 
-                if(detail_result.getPhoneNum()!=null){
+                if (detail_result.getPhoneNum() != null) {
 
                     Log.v(LOG_TAG, detail_result.getPhoneNum());
                     phoneview.setText(detail_result.getPhoneNum());
@@ -440,23 +418,20 @@ public class DetailActivity extends AppCompatActivity {
                         @Override
                         public void onClick(View view) {
 
-        //                            Toast.makeText(DetailActivity.this, "Phone Icon clicked",
-        //                                    Toast.LENGTH_SHORT).show();
-
                             Intent callIntent = new Intent(Intent.ACTION_DIAL);
-                            callIntent.setData(Uri.parse("tel:"+ detail_result.getPhoneNum()));
+                            callIntent.setData(Uri.parse("tel:" + detail_result.getPhoneNum()));
                             startActivity(callIntent);
                         }
                     });
-                }else{
+                } else {
 
-                    phoneview.setText("Phone Number Not Found");
-                    phoneview.setContentDescription("Phone Number Not Found");
+                    phoneview.setText(R.string.phoneNum_not_found);
+                    phoneview.setContentDescription(getString(R.string.phoneNum_not_found));
                 }
 
-                if(detail_result.getDetailOpeningHours()!=null){
+                if (detail_result.getDetailOpeningHours() != null) {
 
-                    for(int i=0; i<7; i++){
+                    for (int i = 0; i < 7; i++) {
                         hours_view.append(detail_result.getDetailOpeningHours().getweekhours()[i]);
                         hours_view.setContentDescription(detail_result.getDetailOpeningHours().getweekhours()[0]
                                 + detail_result.getDetailOpeningHours().getweekhours()[1]
@@ -469,56 +444,55 @@ public class DetailActivity extends AppCompatActivity {
                         Log.v(LOG_TAG, "hours " + (detail_result.getDetailOpeningHours().getweekhours()[i]));
                     }
 
-                }else{
-                    hours_view.setText("Hours not found");
-                    hours_view.setContentDescription("Hours not found");
+                } else {
+                    hours_view.setText(R.string.hours_not_found);
+                    hours_view.setContentDescription(getString(R.string.hours_not_found));
                 }
 
-                if(detail_result.getAddress()!=null){
+                if (detail_result.getAddress() != null) {
 
                     Log.v(LOG_TAG, detail_result.getAddress());
                     address.setText(detail_result.getAddress());
                     address.setContentDescription(detail_result.getAddress());
-                }else{
-                    address.setText("Address not found");
-                    address.setContentDescription("Address not found");
+                } else {
+                    address.setText(R.string.address_not_found);
+                    address.setContentDescription(getString(R.string.address_not_found));
                 }
 
                 CollapsingToolbarLayout collapsingToolbar =
                         (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
 
-                if(detail_result.getname() != null){
+                if (detail_result.getname() != null) {
 
-                    collapsingToolbar.setTitle(detail_result.getname() );
+                    collapsingToolbar.setTitle(detail_result.getname());
                     collapsingToolbar.setCollapsedTitleTextAppearance(R.style.CollapsedAppBar);
                     collapsingToolbar.setExpandedTitleTextAppearance(R.style.ExpandedAppBar);
 
-                }else{
-                    collapsingToolbar.setTitle("Restaurant name not found");
+                } else {
+                    collapsingToolbar.setTitle(getString(R.string.name_not_found));
                 }
 
-
-                if(!detail_result.getPhotos().isEmpty()){
+                if (!detail_result.getPhotos().isEmpty()) {
 
                     Log.v(LOG_TAG, detail_result.getPhotos().get(0).getPhotoReference());
                     Log.v(LOG_TAG, String.format("size = %d", detail_result.getPhotos().size()));
                     photoslist = detail_result.getPhotos();
 
                     Glide.with(getBaseContext()).load("https://maps.googleapis.com/maps/api/place/photo?maxheight=380&photoreference="
-                            +photoslist.get(0).getPhotoReference()
-                            +"&key=" + BuildConfig.GOOGLE_PLACES_API_KEY).centerCrop().into(backdrop);
+                            + photoslist.get(0).getPhotoReference()
+                            + "&key=" + BuildConfig.GOOGLE_PLACES_API_KEY).centerCrop().into(backdrop);
 
                     resPhotoAdapter = new ResPhotoAdapter(getBaseContext(), photoslist);
                     photoRecyclerView.setAdapter(resPhotoAdapter);
-                }else{
+                } else {
 
 //                    Glide.with(getBaseContext()).load(detail_result.geticon()).centerCrop().into(backdrop);
-                    photoHeading.setText("PHOTOS NOT FOUND");
-                    photoHeading.setContentDescription("PHOTOS NOT FOUND");
+                    photoHeading.setText(R.string.photos_not_found);
+                    photoHeading.setContentDescription(getString(R.string.photos_not_found));
 
                 }
 
-                if(!detail_result.getReviews().isEmpty()){
+                if (!detail_result.getReviews().isEmpty()) {
                     Log.v(LOG_TAG, detail_result.getReviews().get(0).getAuthor_name());
                     Log.v(LOG_TAG, detail_result.getReviews().get(0).getText());
                     Log.v(LOG_TAG, String.format("Review Rating = %d", detail_result.getReviews().get(0).getRating()));
@@ -527,9 +501,9 @@ public class DetailActivity extends AppCompatActivity {
                     resReviewAdapter = new ResReviewsAdapter(getBaseContext(), reviewslist);
                     reviewRecyclerView.setAdapter(resReviewAdapter);
 
-                }else{
-                    reviewHeading.setText("REVIEWS NOT FOUND");
-                    reviewHeading.setContentDescription("REVIEWS NOT FOUND");
+                } else {
+                    reviewHeading.setText(R.string.reviews_not_found);
+                    reviewHeading.setContentDescription(getString(R.string.reviews_not_found));
                 }
 
                 mapImage.setOnClickListener(new View.OnClickListener() {
@@ -539,7 +513,7 @@ public class DetailActivity extends AppCompatActivity {
 //                        Toast.makeText(DetailActivity.this, "Maps clicked",
 //                                Toast.LENGTH_SHORT).show();
 
-                        Uri gmmIntentUri = Uri.parse("google.navigation:q="+ detail_result.getAddress());
+                        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + detail_result.getAddress());
                         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                         mapIntent.setPackage("com.google.android.apps.maps");
                         startActivity(mapIntent);
@@ -548,10 +522,10 @@ public class DetailActivity extends AppCompatActivity {
 
                 markedFav = ResMarkedFav(placeID);
 
-                if(markedFav){
+                if (markedFav) {
 
                     fav_fab.setImageResource(R.drawable.ic_favorite_white_24dp);
-                }else{
+                } else {
 
                     fav_fab.setImageResource(R.drawable.ic_favorite_border_white_24dp);
                 }
@@ -562,39 +536,39 @@ public class DetailActivity extends AppCompatActivity {
 
 //                        Toast.makeText(DetailActivity.this, "Fav Heart clicked", Toast.LENGTH_SHORT).show();
 
-                        if(markedFav){
+                        if (markedFav) {
 
                             delete_result = DeleteFavResData(placeID);
 
-                            if(delete_result){
+                            if (delete_result) {
                                 markedFav = false;
                                 fav_fab.setImageResource(R.drawable.ic_favorite_border_white_24dp);
                                 Toast.makeText(DetailActivity.this,
-                                        "Deleted from Favorites", Toast.LENGTH_SHORT).show();
+                                        R.string.del_fav, Toast.LENGTH_SHORT).show();
 
-                            }else{
+                            } else {
 
                                 fav_fab.setImageResource(R.drawable.ic_favorite_white_24dp);
                                 Toast.makeText(DetailActivity.this,
-                                        "Deletion Failed", Toast.LENGTH_SHORT).show();
+                                        R.string.del_failed, Toast.LENGTH_SHORT).show();
                             }
-                        }else{
+                        } else {
 
                             insert_result = insertFavMovieData(placeID, detail_result.getname(),
                                     detail_result.getAddress());
 
-                            if(insert_result){
+                            if (insert_result) {
 
                                 markedFav = true;
                                 fav_fab.setImageResource(R.drawable.ic_favorite_white_24dp);
                                 Toast.makeText(DetailActivity.this,
-                                        "Added to Favorites", Toast.LENGTH_SHORT).show();
+                                        R.string.add_fav, Toast.LENGTH_SHORT).show();
 
-                            }else{
+                            } else {
 
                                 fav_fab.setImageResource(R.drawable.ic_favorite_border_white_24dp);
                                 Toast.makeText(DetailActivity.this,
-                                        "Adding to Fav Failed", Toast.LENGTH_SHORT).show();
+                                        R.string.add_failed, Toast.LENGTH_SHORT).show();
                             }
 
                         }

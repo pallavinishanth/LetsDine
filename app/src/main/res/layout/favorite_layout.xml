@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
@@ -12,7 +13,7 @@
         android:textSize="@dimen/heading_textsize"
         android:textColor="@color/black"
         android:textAlignment="center"
-        android:padding="@dimen/fav_heart_padding"/>
+        android:padding="@dimen/fav_heart_padding" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/fav_recycler_view"
@@ -24,6 +25,6 @@
         android:paddingLeft="@dimen/list_side_margin"
         android:paddingRight="@dimen/list_side_margin"
         android:paddingBottom="@dimen/list_side_margin"
-        android:contentDescription="@string/Fav_Restaurant_List"/>
+        android:contentDescription="@string/Fav_Restaurant_List" />
 
 </LinearLayout>

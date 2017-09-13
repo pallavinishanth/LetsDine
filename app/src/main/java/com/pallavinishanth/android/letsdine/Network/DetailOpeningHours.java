@@ -7,7 +7,7 @@ import android.os.Parcelable;
  * Created by PallaviNishanth on 7/14/17.
  */
 
-public class DetailOpeningHours implements Parcelable{
+public class DetailOpeningHours implements Parcelable {
 
     private Boolean open_now;
     private String[] weekday_text = new String[7];
@@ -26,12 +26,12 @@ public class DetailOpeningHours implements Parcelable{
         this.open_now = open_now;
     }
 
-    public String[] getweekhours(){
+    public String[] getweekhours() {
 
         return weekday_text;
     }
 
-    public void setweekhours(String[] weekHours){
+    public void setweekhours(String[] weekHours) {
 
         this.weekday_text = weekHours;
     }
@@ -41,7 +41,7 @@ public class DetailOpeningHours implements Parcelable{
         return 0;
     }
 
-    private DetailOpeningHours(Parcel in){
+    private DetailOpeningHours(Parcel in) {
 
         open_now = in.readByte() != 0;
 
@@ -57,7 +57,7 @@ public class DetailOpeningHours implements Parcelable{
         parcel.writeStringArray(weekday_text);
     }
 
-    public static final Parcelable.Creator<DetailOpeningHours> CREATOR = new Parcelable.Creator<DetailOpeningHours>(){
+    public static final Parcelable.Creator<DetailOpeningHours> CREATOR = new Parcelable.Creator<DetailOpeningHours>() {
 
         @Override
         public DetailOpeningHours createFromParcel(Parcel parcel) {

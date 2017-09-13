@@ -1,7 +1,7 @@
 package com.pallavinishanth.android.letsdine;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +35,7 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
     }
 
 
-    public ResDataAdapter(Context context, List<Results> resresults){
+    public ResDataAdapter(Context context, List<Results> resresults) {
 
         this.rContext = context;
         this.res_results = resresults;
@@ -57,90 +57,90 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
     public void onBindViewHolder(ResDataAdapter.ViewHolder holder, int position) {
 
 
-        if(res_results.get(position).getName()!=null) {
+        if (res_results.get(position).getName() != null) {
 
             holder.res_name_view.setText(res_results.get(position).getName());
             holder.res_name_view.setContentDescription(res_results.get(position).getName());
-        }else{
-            holder.res_name_view.setText("Name not Found");
+        } else {
+            holder.res_name_view.setText(R.string.name_not_found);
         }
 
-        if(res_results.get(position).getVicinity()!=null) {
+        if (res_results.get(position).getVicinity() != null) {
 
             holder.res_address_view.setText(res_results.get(position).getVicinity());
             holder.res_address_view.setContentDescription(res_results.get(position).getVicinity());
-        }else{
-            holder.res_address_view.setText("Address not Found");
+        } else {
+            holder.res_address_view.setText(R.string.address_not_found);
         }
 
-        if(res_results.get(position).getOpeningHours()!=null) {
+        if (res_results.get(position).getOpeningHours() != null) {
 
             if (res_results.get(position).getOpeningHours().getOpenNow() == true) {
 
-                holder.res_opening_hours.setText("Open Now");
-                holder.res_opening_hours.setTextColor(Color.parseColor("#4CAF50"));
-                holder.res_opening_hours.setContentDescription("Open Now");
+                holder.res_opening_hours.setText(R.string.open);
+                holder.res_opening_hours.setTextColor(ContextCompat.getColor(rContext, R.color.open_green));
+                holder.res_opening_hours.setContentDescription(rContext.getString(R.string.open));
 
             } else {
 
-                holder.res_opening_hours.setText("Closed Now");
-                holder.res_opening_hours.setTextColor(Color.RED);
-                holder.res_opening_hours.setContentDescription("Closed Now");
+                holder.res_opening_hours.setText(R.string.closed);
+                holder.res_opening_hours.setTextColor(ContextCompat.getColor(rContext, R.color.close_red));
+                holder.res_opening_hours.setContentDescription(rContext.getString(R.string.closed));
             }
         }
 
 
-        if(res_results.get(position).getPhotos()==null){
+        if (res_results.get(position).getPhotos() == null) {
 
             Glide.with(rContext).load(res_results.get(position).getIcon()).into(holder.rImageView);
-        }else{
+        } else {
 
 
             Glide.with(rContext).load("https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="
-                    +res_results.get(position).getPhotos().get(0).getPhotoReference()
-                    +"&key=" + BuildConfig.GOOGLE_PLACES_API_KEY).centerCrop().into(holder.rImageView);
+                    + res_results.get(position).getPhotos().get(0).getPhotoReference()
+                    + "&key=" + BuildConfig.GOOGLE_PLACES_API_KEY).centerCrop().into(holder.rImageView);
         }
 
-        if(res_results.get(position).getRating() == null){
+        if (res_results.get(position).getRating() == null) {
 
-            holder.res_rating_view.setText("Rating: - -");
-            holder.res_rating_view.setContentDescription("Rating Not Found");
-        } else{
+            holder.res_rating_view.setText(R.string.rating_null);
+            holder.res_rating_view.setContentDescription(rContext.getString(R.string.rating_notfound));
+        } else {
 
             holder.res_rating_view.setText("Rating: " + Double.toString(res_results.get(position).getRating()));
             holder.res_rating_view.setContentDescription("Rating" + Double.toString(res_results.get(position).getRating()));
         }
 
-        if(res_results.get(position).getPriceLevel() != null) {
+        if (res_results.get(position).getPriceLevel() != null) {
 
             switch (res_results.get(position).getPriceLevel()) {
 
                 case 0:
-                    holder.res_pricelevel_view.setText("0");
-                    holder.res_pricelevel_view.setContentDescription("price level Zero");
+                    holder.res_pricelevel_view.setText(R.string.zero);
+                    holder.res_pricelevel_view.setContentDescription(rContext.getString(R.string.price_zero));
                     break;
                 case 1:
-                    holder.res_pricelevel_view.setText("$");
-                    holder.res_pricelevel_view.setContentDescription("Single Dollar");
+                    holder.res_pricelevel_view.setText(R.string.single_dollar);
+                    holder.res_pricelevel_view.setContentDescription(rContext.getString(R.string.single_dollarcd));
                     break;
                 case 2:
-                    holder.res_pricelevel_view.setText("$$");
-                    holder.res_pricelevel_view.setContentDescription("Double Dollar");
+                    holder.res_pricelevel_view.setText(R.string.double_dollar);
+                    holder.res_pricelevel_view.setContentDescription(rContext.getString(R.string.double_dollarcd));
                     break;
                 case 3:
-                    holder.res_pricelevel_view.setText("$$$");
-                    holder.res_pricelevel_view.setContentDescription("Triple Dollar");
+                    holder.res_pricelevel_view.setText(R.string.triple_dollar);
+                    holder.res_pricelevel_view.setContentDescription(rContext.getString(R.string.triple_dollarcd));
                     break;
                 case 4:
-                    holder.res_pricelevel_view.setText("$$$$");
-                    holder.res_pricelevel_view.setContentDescription("Four Dollar");
+                    holder.res_pricelevel_view.setText(R.string.four_dollar);
+                    holder.res_pricelevel_view.setContentDescription(rContext.getString(R.string.four_dollarcd));
                     break;
                 default:
                     break;
             }
-        }else{
-            holder.res_pricelevel_view.setText("- - - -");
-            holder.res_pricelevel_view.setContentDescription("Price level not found");
+        } else {
+            holder.res_pricelevel_view.setText(R.string.noprice);
+            holder.res_pricelevel_view.setContentDescription(rContext.getString(R.string.price_notfound));
         }
 
     }
@@ -173,13 +173,13 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
             res_rating_view = (TextView) view.findViewById(R.id.res_rating);
             res_opening_hours = (TextView) view.findViewById(R.id.res_opening_hours);
 
-            view.setOnClickListener(new View.OnClickListener(){
+            view.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View view) {
 
                     int position = getAdapterPosition();
-                    if(position!= RecyclerView.NO_POSITION) {
+                    if (position != RecyclerView.NO_POSITION) {
                         listener.onItemClick(view, position);
                     }
                 }

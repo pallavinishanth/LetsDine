@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
     static String loc;
 
-    static int i=0;
+    static int i = 0;
 
     final String RES_DATA_API = "https://maps.googleapis.com/maps/";
     private int RADIUS = 10000;
@@ -109,14 +109,14 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
-        ActionBar actionBar=getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(true);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        progress_bar = (ProgressBar)findViewById(R.id.progressBar);
+        progress_bar = (ProgressBar) findViewById(R.id.progressBar);
         mCLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
 
-        LocTextView = (TextView)findViewById(R.id.location);
+        LocTextView = (TextView) findViewById(R.id.location);
 
         getLocation();
 
@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled the operation.
-                Log.i(LOG_TAG, "User Canceled the operation " );
+                Log.i(LOG_TAG, "User Canceled the operation ");
             }
         }
     }
@@ -191,14 +191,14 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
         getLatLong();
     }
 
-    public void getLocation(){
+    public void getLocation() {
 
         Log.d(LOG_TAG, "getLocation");
 
         //Location Manager is used to figure out which location provider needs to be used.
-        locationManager=(LocationManager)getSystemService(LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         //Best location provider is decided by the criteria
-        criteria=new Criteria();
+        criteria = new Criteria();
         //location manager will take the best location from the criteria
         locationManager.getBestProvider(criteria, true);
 
@@ -210,6 +210,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mLocationPermissionGranted = true;
+            getLatLong();
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
@@ -218,34 +219,33 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
     }
 
-    public void getLatLong(){
+    public void getLatLong() {
 
         try {
-            if(mLocationPermissionGranted) {
+            if (mLocationPermissionGranted) {
 
                 Log.d(LOG_TAG, "mLocationPermissionGranted true");
 
                 location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
 
-                if(location!=null){
+                if (location != null) {
 
                     latitude = location.getLatitude();
                     longitude = location.getLongitude();
 
                     Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
-                }else{
+                } else {
 
                     latitude = default_latitude;
                     longitude = default_longitude;
                 }
 
-                Geocoder gcd=new Geocoder(this, Locale.getDefault());
+                Geocoder gcd = new Geocoder(this, Locale.getDefault());
                 List<Address> addresses;
 
                 try {
-                    addresses=gcd.getFromLocation(latitude,longitude,1);
-                    if(addresses.size()>0)
-                    {
+                    addresses = gcd.getFromLocation(latitude, longitude, 1);
+                    if (addresses.size() > 0) {
                         cityname = addresses.get(0).getLocality().toString();
                         //state = addresses.get(0).getAdminArea().toString();
 
@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
                 }
 
-                if(current_loc==true && resJSONdata.isEmpty()) {
+                if (current_loc == true && resJSONdata.isEmpty()) {
 
                     Log.d(LOG_TAG, "calling retrofit...");
                     Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
                 resRecyclerView.setAdapter(resDataAdapter);
 
-                resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener(){
+                resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener() {
 
                     @Override
                     public void onItemClick(View itemView, int position) {
@@ -296,22 +296,21 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                                     .toBundle();
 
                             startActivity(i, bundle);
-                        }else{
+                        } else {
                             startActivity(i);
                         }
 
                     }
                 });
 
-            }else{
+            } else {
 
-                Geocoder gcd=new Geocoder(this, Locale.getDefault());
+                Geocoder gcd = new Geocoder(this, Locale.getDefault());
                 List<Address> addresses;
 
                 try {
-                    addresses=gcd.getFromLocation(default_latitude,default_longitude,1);
-                    if(addresses.size()>0)
-                    {
+                    addresses = gcd.getFromLocation(default_latitude, default_longitude, 1);
+                    if (addresses.size() > 0) {
                         cityname = addresses.get(0).getLocality().toString();
                         //state = addresses.get(0).getAdminArea().toString();
 
@@ -324,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
                 }
 
-                if(current_loc==true && resJSONdata.isEmpty()) {
+                if (current_loc == true && resJSONdata.isEmpty()) {
 
                     Log.d(LOG_TAG, "calling retrofit...");
                     Log.d(LOG_TAG, "latitude : " + default_longitude + "longitude : " + default_longitude);
@@ -342,7 +341,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
                 resRecyclerView.setAdapter(resDataAdapter);
 
-                resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener(){
+                resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener() {
 
                     @Override
                     public void onItemClick(View itemView, int position) {
@@ -362,14 +361,14 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                                     .toBundle();
 
                             startActivity(i, bundle);
-                        }else{
+                        } else {
                             startActivity(i);
                         }
 
                     }
                 });
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
 
@@ -388,14 +387,14 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
         current_loc = false;
         progress_bar.setVisibility(ProgressBar.VISIBLE);
         progressBarIsShowing = true;
-        retrofit_response(Sel_location.latitude +"," +Sel_location.longitude);
+        retrofit_response(Sel_location.latitude + "," + Sel_location.longitude);
     }
 
     @Override
     public void onError(Status status) {
 
         Log.e(LOG_TAG, "onError: Status = " + status.toString());
-        Toast.makeText(this, "Location selection failed: " + status.getStatusMessage(),
+        Toast.makeText(this, R.string.loc_sel_failed + status.getStatusMessage(),
                 Toast.LENGTH_SHORT).show();
 
     }
@@ -432,7 +431,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
         Log.d(LOG_TAG, "on resume");
 
-        if(current_loc==false)
+        if (current_loc == false)
             LocTextView.setText(loc);
     }
 
@@ -464,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
         }
     }
 
-    private void retrofit_response(String location){
+    private void retrofit_response(String location) {
 
         Retrofit resRetrofit = new Retrofit.Builder()
                 .baseUrl(RES_DATA_API)
@@ -489,39 +488,39 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putInt("DataSize", res_data_count);
 
-                for(int i=0; i<res_data_count;i++){
-                    editor.putString("PlaceID"+"_" + i, resJSONdata.get(i).getPlaceId());
+                for (int i = 0; i < res_data_count; i++) {
+                    editor.putString("PlaceID" + "_" + i, resJSONdata.get(i).getPlaceId());
 
                 }
 
-                for(int i=0; i<res_data_count;i++){
+                for (int i = 0; i < res_data_count; i++) {
 
-                    if(resJSONdata.get(i).getName() != null) {
+                    if (resJSONdata.get(i).getName() != null) {
                         editor.putString("RESName" + "_" + i, resJSONdata.get(i).getName());
-                    }else{
+                    } else {
                         editor.putString("RESName" + "_" + i, "name not found");
                     }
 
                 }
-                for(int i=0; i<res_data_count;i++){
+                for (int i = 0; i < res_data_count; i++) {
 
-                    if(resJSONdata.get(i).getVicinity() != null) {
+                    if (resJSONdata.get(i).getVicinity() != null) {
                         editor.putString("RESVicinity" + "_" + i, resJSONdata.get(i).getVicinity());
-                    }else{
+                    } else {
                         editor.putString("RESVicinity" + "_" + i, "Address not found");
                     }
                 }
-                for(int i=0; i<res_data_count;i++){
+                for (int i = 0; i < res_data_count; i++) {
 
-                    if(resJSONdata.get(i).getOpeningHours() != null){
-                        editor.putBoolean("RESHours"+"_" + i, resJSONdata.get(i).getOpeningHours().getOpenNow());
+                    if (resJSONdata.get(i).getOpeningHours() != null) {
+                        editor.putBoolean("RESHours" + "_" + i, resJSONdata.get(i).getOpeningHours().getOpenNow());
                     }
 
                 }
 
                 editor.apply();
 
-                for(Results result: resJSONdata){
+                for (Results result : resJSONdata) {
 
                     Log.v(LOG_TAG, "Nearby Restaurant Name is " + result.getName());
 
