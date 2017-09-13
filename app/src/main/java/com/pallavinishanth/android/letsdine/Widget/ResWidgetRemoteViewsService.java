@@ -4,8 +4,8 @@ import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -53,19 +53,19 @@ class ResRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         hours = new boolean[size];
         place_id_array = new String[size];
 
-        for(int i=0; i<size; i++) {
-            place_id_array[i] = preferences.getString("PlaceID"+"_" + i, null);
+        for (int i = 0; i < size; i++) {
+            place_id_array[i] = preferences.getString("PlaceID" + "_" + i, null);
         }
 
-        for(int i=0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             nameArray[i] = preferences.getString("RESName" + "_" + i, null);
 
         }
-        for(int i=0; i<size; i++) {
-            vicinityArray[i] = preferences.getString("RESVicinity"+"_" + i, null);
+        for (int i = 0; i < size; i++) {
+            vicinityArray[i] = preferences.getString("RESVicinity" + "_" + i, null);
         }
-        for(int i=0; i<size; i++) {
-            hours[i] = preferences.getBoolean("RESHours"+"_" + i, false);
+        for (int i = 0; i < size; i++) {
+            hours[i] = preferences.getBoolean("RESHours" + "_" + i, false);
         }
 
     }
@@ -87,18 +87,18 @@ class ResRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     public RemoteViews getViewAt(int position) {
 
-        RemoteViews row=new RemoteViews(mContext.getPackageName(),
+        RemoteViews row = new RemoteViews(mContext.getPackageName(),
                 R.layout.widget_item);
 
         row.setTextViewText(R.id.widget_res_name, nameArray[position]);
         row.setTextViewText(R.id.widget_res_vicinity, vicinityArray[position]);
 
-        if(hours[position] == true) {
-            row.setTextViewText(R.id.widget_res_hours, "Open Now");
-            row.setTextColor(R.id.widget_res_hours, Color.parseColor("#4CAF50"));
-        }else{
-            row.setTextViewText(R.id.widget_res_hours, "Closed Now");
-            row.setTextColor(R.id.widget_res_hours, Color.RED);
+        if (hours[position] == true) {
+            row.setTextViewText(R.id.widget_res_hours, mContext.getString(R.string.open));
+            row.setTextColor(R.id.widget_res_hours, ContextCompat.getColor(mContext, R.color.open_green));
+        } else {
+            row.setTextViewText(R.id.widget_res_hours, mContext.getString(R.string.closed));
+            row.setTextColor(R.id.widget_res_hours, ContextCompat.getColor(mContext, R.color.close_red));
         }
 
         final Intent fillInIntent = new Intent();
@@ -106,7 +106,7 @@ class ResRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         fillInIntent.putExtra(DetailActivity.PLACE_ID, place_id_array[position]);
         row.setOnClickFillInIntent(R.id.widget_list_item, fillInIntent);
 
-        return(row);
+        return (row);
     }
 
     public RemoteViews getLoadingView() {

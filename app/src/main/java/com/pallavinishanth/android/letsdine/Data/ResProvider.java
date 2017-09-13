@@ -10,8 +10,6 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import static android.R.attr.name;
-
 /**
  * Created by PallaviNishanth on 9/8/17.
  */
@@ -24,7 +22,7 @@ public class ResProvider extends ContentProvider {
 
     private static final SQLiteQueryBuilder sMovieQBuilder;
 
-    static{
+    static {
 
         sMovieQBuilder = new SQLiteQueryBuilder();
         sMovieQBuilder.setTables(ResContract.ResEntry.TABLE_NAME);
@@ -35,7 +33,7 @@ public class ResProvider extends ContentProvider {
 
     private ResDbHelper mOpenHelper;
 
-    static UriMatcher buildUriMatcher(){
+    static UriMatcher buildUriMatcher() {
 
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = ResContract.CONTENT_AUTHORITY;
@@ -86,10 +84,10 @@ public class ResProvider extends ContentProvider {
                 //db.beginTransaction();
                 long _id = db.insert(ResContract.ResEntry.TABLE_NAME, null, contentValues);
 
-                if(_id >0){
+                if (_id > 0) {
 
                     returnUri = ResContract.ResEntry.buildFavResUri(String.valueOf(_id));
-                }else
+                } else
 
                     throw new android.database.SQLException("Failed to insert row into " + uri);
 
@@ -117,14 +115,14 @@ public class ResProvider extends ContentProvider {
         int rowsDeleted;
 
         // this makes delete all rows return the number of rows deleted
-        if ( null == selection ) selection = "1";
+        if (null == selection) selection = "1";
 
-        switch(match){
+        switch (match) {
 
             case RES_WITH_NAME:
 
                 String placeid = ResContract.ResEntry.getFavResName(uri);
-                selection = ResContract.ResEntry.COLUMN_PLACE_ID + "=" + "'"+ placeid + "'";
+                selection = ResContract.ResEntry.COLUMN_PLACE_ID + "=" + "'" + placeid + "'";
                 rowsDeleted = db.delete(ResContract.ResEntry.TABLE_NAME, selection, selectionArgs);
                 break;
 
@@ -132,7 +130,7 @@ public class ResProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
-        if(rowsDeleted!=0){
+        if (rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsDeleted;

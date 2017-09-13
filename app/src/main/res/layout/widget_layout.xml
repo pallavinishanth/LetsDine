@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -12,7 +11,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id = "@+id/widget_title"
+        android:id="@+id/widget_title"
         android:gravity="center"
         android:background="@color/colorPrimary"
         android:text="@string/widget_title"
@@ -23,9 +22,8 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id = "@+id/widget_list"
-        tools:listitem="@layout/widget_item">
-    </ListView>
+        android:id="@+id/widget_list"
+        tools:listitem="@layout/widget_item"></ListView>
 
     <TextView
         android:layout_width="match_parent"
@@ -34,6 +32,6 @@
         android:gravity="center"
         android:textColor="#ffffff"
         android:textStyle="bold"
-        android:textSize="@dimen/heading_textsize"/>
+        android:textSize="@dimen/heading_textsize" />
 
 </LinearLayout>

@@ -16,13 +16,13 @@ import java.util.ArrayList;
  * Created by PallaviNishanth on 7/24/17.
  */
 
-public class ResPhotoAdapter extends RecyclerView.Adapter<ResPhotoAdapter.ViewHolder>  {
+public class ResPhotoAdapter extends RecyclerView.Adapter<ResPhotoAdapter.ViewHolder> {
 
     private Context rContext;
 
     ArrayList<DetailPhotos> res_photos;
 
-    public ResPhotoAdapter(Context context, ArrayList<DetailPhotos> resPhotos){
+    public ResPhotoAdapter(Context context, ArrayList<DetailPhotos> resPhotos) {
 
         this.rContext = context;
         this.res_photos = resPhotos;
@@ -33,8 +33,8 @@ public class ResPhotoAdapter extends RecyclerView.Adapter<ResPhotoAdapter.ViewHo
     public void onBindViewHolder(ResPhotoAdapter.ViewHolder holder, int position) {
 
         Glide.with(rContext).load("https://maps.googleapis.com/maps/api/place/photo?maxheight=300&maxwidth=300&photoreference="
-                +res_photos.get(position).getPhotoReference()
-                +"&key=" + BuildConfig.GOOGLE_PLACES_API_KEY).centerCrop().into(holder.rphoto);
+                + res_photos.get(position).getPhotoReference()
+                + "&key=" + BuildConfig.GOOGLE_PLACES_API_KEY).centerCrop().into(holder.rphoto);
     }
 
     @Override

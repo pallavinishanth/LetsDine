@@ -78,7 +78,7 @@ public class Photos implements Parcelable {
         return 0;
     }
 
-    private Photos(Parcel in){
+    private Photos(Parcel in) {
         photo_reference = in.readString();
         height = in.readInt();
         width = in.readInt();
@@ -97,7 +97,7 @@ public class Photos implements Parcelable {
 
     }
 
-    public static final Parcelable.Creator<Photos> CREATOR = new Parcelable.Creator<Photos>(){
+    public static final Parcelable.Creator<Photos> CREATOR = new Parcelable.Creator<Photos>() {
 
         @Override
         public Photos createFromParcel(Parcel parcel) {

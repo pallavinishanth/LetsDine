@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * Created by PallaviNishanth on 7/14/17.
  */
 
-public class Results implements Parcelable{
+public class Results implements Parcelable {
 
     private String icon;
     private String id;
@@ -193,7 +193,7 @@ public class Results implements Parcelable{
         this.vicinity = vicinity;
     }
 
-    private Results(Parcel in){
+    private Results(Parcel in) {
 
         icon = in.readString();
         id = in.readString();
@@ -224,18 +224,18 @@ public class Results implements Parcelable{
         parcel.writeString(place_id);
         parcel.writeString(scope);
 
-        if(price_level!=null)
-        parcel.writeInt(price_level);
+        if (price_level != null)
+            parcel.writeInt(price_level);
 
-        if(rating!=null)
-        parcel.writeDouble(rating);
+        if (rating != null)
+            parcel.writeDouble(rating);
 
         parcel.writeString(vicinity);
 
 
     }
 
-    public static final Parcelable.Creator<Results> CREATOR = new Parcelable.Creator<Results>(){
+    public static final Parcelable.Creator<Results> CREATOR = new Parcelable.Creator<Results>() {
 
         @Override
         public Results createFromParcel(Parcel parcel) {

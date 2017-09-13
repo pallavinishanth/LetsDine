@@ -15,13 +15,13 @@ import java.util.ArrayList;
  * Created by PallaviNishanth on 8/8/17.
  */
 
-public class ResReviewsAdapter extends RecyclerView.Adapter<ResReviewsAdapter.ViewHolder>{
+public class ResReviewsAdapter extends RecyclerView.Adapter<ResReviewsAdapter.ViewHolder> {
 
     private Context rContext;
 
     ArrayList<Reviews> res_reviews;
 
-    public ResReviewsAdapter(Context context, ArrayList<Reviews> res_reviews){
+    public ResReviewsAdapter(Context context, ArrayList<Reviews> res_reviews) {
 
         this.rContext = context;
         this.res_reviews = res_reviews;
@@ -31,20 +31,24 @@ public class ResReviewsAdapter extends RecyclerView.Adapter<ResReviewsAdapter.Vi
     @Override
     public void onBindViewHolder(ResReviewsAdapter.ViewHolder holder, int position) {
 
-        if(!res_reviews.get(position).getAuthor_name().isEmpty()){
+        if (!res_reviews.get(position).getAuthor_name().isEmpty()) {
 
             holder.rAuthor.setText(res_reviews.get(position).getAuthor_name());
-        }else{
-            holder.rAuthor.setText("Author Name Not Found");
+            holder.rAuthor.setContentDescription(res_reviews.get(position).getAuthor_name());
+        } else {
+            holder.rAuthor.setText(R.string.Aname_notfound);
+            holder.rAuthor.setContentDescription(rContext.getString(R.string.Aname_notfound));
         }
 
-        holder.rRating.setText("Rating: "+ Integer.toString(res_reviews.get(position).getRating()));
+        holder.rRating.setText("Rating: " + Integer.toString(res_reviews.get(position).getRating()));
 
-        if(!res_reviews.get(position).getText().isEmpty()){
+        if (!res_reviews.get(position).getText().isEmpty()) {
 
             holder.rAuthorText.setText(res_reviews.get(position).getText());
-        }else{
-            holder.rAuthorText.setText("Review Text Not Found");
+            holder.rAuthorText.setContentDescription(res_reviews.get(position).getText());
+        } else {
+            holder.rAuthorText.setText(R.string.review_notfound);
+            holder.rAuthorText.setContentDescription(rContext.getString(R.string.review_notfound));
         }
 
     }

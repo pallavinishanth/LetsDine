@@ -35,4 +35,47 @@
     <string name="action_fav">Favorite</string>
     <string name="fav_heading">Favorite Restaurants</string>
 
+    <string name="del_fav">Deleted from Favorites</string>
+    <string name="del_failed">Deletion Failed</string>
+    <string name="add_fav">Added to Favorites</string>
+    <string name="add_failed">Adding to Favorite Failed</string>
+
+    <string name="url_not_found">URL not found</string>
+    <string name="phoneNum_not_found">Phone Number Not Found</string>
+    <string name="hours_not_found">Hours Not Found</string>
+    <string name="address_not_found">Address Not Found</string>
+
+    <string name="name_not_found">Restaurant Name Not Found</string>
+
+    <string name="photos_not_found">Photos Not Found</string>
+    <string name="reviews_not_found">Reviews Not Found</string>
+    <string name="loc_sel_failed">Location selection failed:</string>
+
+    <string name="no_fav">No Restaurants in Favorite List</string>
+    <string name="open">Open Now</string>
+    <string name="closed">Closed Now</string>
+
+    <string name="rating_null">Rating: - -</string>
+    <string name="rating_notfound">Rating Not Found</string>
+    <string name="rating">Rating: </string>
+    <string name="ratingcd">Rating</string>
+
+    <string name="zero">0</string>
+    <string name="price_zero">price level Zero</string>
+    <string name="single_dollar">$</string>
+    <string name="double_dollar">$$</string>
+    <string name="triple_dollar">$$$</string>
+    <string name="four_dollar">$$$$</string>
+
+    <string name="single_dollarcd">Single Dollar</string>
+    <string name="double_dollarcd">Double Dollar</string>
+    <string name="triple_dollarcd">Triple Dollar</string>
+    <string name="four_dollarcd">Four Dollar</string>
+
+    <string name="price_notfound">Price level not found</string>
+    <string name="noprice">- - - -</string>
+    <string name="Aname_notfound">Author Name Not Found</string>
+    <string name="review_notfound">Review Text Not Found</string>
+
+
 </resources>
