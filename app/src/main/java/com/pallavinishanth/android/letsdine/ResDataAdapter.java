@@ -107,8 +107,8 @@ public class ResDataAdapter extends RecyclerView.Adapter<ResDataAdapter.ViewHold
             holder.res_rating_view.setContentDescription(rContext.getString(R.string.rating_notfound));
         } else {
 
-            holder.res_rating_view.setText("Rating: " + Double.toString(res_results.get(position).getRating()));
-            holder.res_rating_view.setContentDescription("Rating" + Double.toString(res_results.get(position).getRating()));
+            holder.res_rating_view.setText(rContext.getString(R.string.rating) + Double.toString(res_results.get(position).getRating()));
+            holder.res_rating_view.setContentDescription(rContext.getString(R.string.ratingcd) + Double.toString(res_results.get(position).getRating()));
         }
 
         if (res_results.get(position).getPriceLevel() != null) {
