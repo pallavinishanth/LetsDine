@@ -40,7 +40,7 @@ public class ResReviewsAdapter extends RecyclerView.Adapter<ResReviewsAdapter.Vi
             holder.rAuthor.setContentDescription(rContext.getString(R.string.Aname_notfound));
         }
 
-        holder.rRating.setText(R.string.rating + Integer.toString(res_reviews.get(position).getRating()));
+        holder.rRating.setText("Rating: " + Integer.toString(res_reviews.get(position).getRating()));
 
         if (!res_reviews.get(position).getText().isEmpty()) {
 

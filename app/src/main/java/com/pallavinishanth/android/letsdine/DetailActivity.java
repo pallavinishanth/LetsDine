@@ -61,9 +61,6 @@ public class DetailActivity extends AppCompatActivity {
     private RecyclerView reviewRecyclerView;
     private RecyclerView.LayoutManager reviewLayoutManager;
 
-    private ResDetailAdapter resDetailAdapter;
-    private RecyclerView detailRecyclerView;
-
     private static ArrayList<DetailPhotos> photoslist = new ArrayList<DetailPhotos>();
     private static ArrayList<Reviews> reviewslist = new ArrayList<Reviews>();
     private String placeID;
@@ -71,7 +68,6 @@ public class DetailActivity extends AppCompatActivity {
     private static DetailResult detail_result = new DetailResult();
 
     TextView hours_view;
-    ImageView res_Photo;
     TextView website_view;
     TextView address;
     ImageView backdrop;
