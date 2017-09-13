@@ -64,7 +64,7 @@ public class FavoriteActivity extends AppCompatActivity
 
         Log.d(LOG_TAG, "onLoadFinished....");
 
-        if(cursor !=null && cursor.getCount() > 0){
+        if (cursor != null && cursor.getCount() > 0) {
 
             cursor.moveToFirst();
             int i = 0;
