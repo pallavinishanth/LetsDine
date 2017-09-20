@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d(LOG_TAG, "onCreate");
+//        Log.d(LOG_TAG, "onCreate");
         setContentView(activity_main);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
             LocTextView.setText(savedInstanceState.getString(KEY_LOCATION));
             resJSONdata = savedInstanceState.getParcelableArrayList("RES_LIST");
             progressBarIsShowing = savedInstanceState.getBoolean("progressBarIsShowing");
-            Log.d(LOG_TAG, "After rotating" + LocTextView.getText().toString());
+//            Log.d(LOG_TAG, "After rotating" + LocTextView.getText().toString());
 //            Log.d(LOG_TAG, "After rotating" + resJSONdata.get(1).getName().toString());
         }
 
@@ -158,16 +158,16 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
-                Log.i(LOG_TAG, "Place: " + place.getName());
+//                Log.i(LOG_TAG, "Place: " + place.getName());
                 this.onPlaceSelected(place);
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
-                Log.i(LOG_TAG, status.getStatusMessage());
+//                Log.i(LOG_TAG, status.getStatusMessage());
                 this.onError(status);
 
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled the operation.
-                Log.i(LOG_TAG, "User Canceled the operation ");
+//                Log.i(LOG_TAG, "User Canceled the operation ");
             }
         }
     }
@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                                            @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
 
-        Log.d(LOG_TAG, "onRequestPermissionsResult");
+//        Log.d(LOG_TAG, "onRequestPermissionsResult");
         mLocationPermissionGranted = false;
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
     public void getLocation() {
 
-        Log.d(LOG_TAG, "getLocation");
+//        Log.d(LOG_TAG, "getLocation");
 
         //Location Manager is used to figure out which location provider needs to be used.
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
         try {
             if (mLocationPermissionGranted) {
 
-                Log.d(LOG_TAG, "mLocationPermissionGranted true");
+//                Log.d(LOG_TAG, "mLocationPermissionGranted true");
 
                 location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
 
@@ -233,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                     latitude = location.getLatitude();
                     longitude = location.getLongitude();
 
-                    Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
+//                    Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
                 } else {
 
                     latitude = default_latitude;
@@ -248,8 +248,8 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                     if (addresses.size() > 0) {
                         cityname = addresses.get(0).getLocality().toString();
                         //state = addresses.get(0).getAdminArea().toString();
-
-                        Log.d(LOG_TAG, "After back button pressed");
+//
+//                        Log.d(LOG_TAG, "After back button pressed");
                         LocTextView.setText(cityname);
                     }
 
@@ -260,8 +260,8 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
                 if (current_loc == true && resJSONdata.isEmpty()) {
 
-                    Log.d(LOG_TAG, "calling retrofit...");
-                    Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
+//                    Log.d(LOG_TAG, "calling retrofit...");
+//                    Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
                     progress_bar.setVisibility(ProgressBar.VISIBLE);
                     progressBarIsShowing = true;
                     retrofit_response(latitude + "," + longitude);
@@ -314,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
                         cityname = addresses.get(0).getLocality().toString();
                         //state = addresses.get(0).getAdminArea().toString();
 
-                        Log.d(LOG_TAG, "After back button pressed");
+//                        Log.d(LOG_TAG, "After back button pressed");
                         LocTextView.setText(cityname);
                     }
 
@@ -325,8 +325,8 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
                 if (current_loc == true && resJSONdata.isEmpty()) {
 
-                    Log.d(LOG_TAG, "calling retrofit...");
-                    Log.d(LOG_TAG, "latitude : " + default_longitude + "longitude : " + default_longitude);
+//                    Log.d(LOG_TAG, "calling retrofit...");
+//                    Log.d(LOG_TAG, "latitude : " + default_longitude + "longitude : " + default_longitude);
                     progress_bar.setVisibility(ProgressBar.VISIBLE);
                     progressBarIsShowing = true;
                     retrofit_response(default_latitude + "," + default_longitude);
@@ -377,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     @Override
     public void onPlaceSelected(Place place) {
 
-        Log.i(LOG_TAG, "Place Selected: " + place.getName());
+//        Log.i(LOG_TAG, "Place Selected: " + place.getName());
 
         loc = place.getName().toString();
 
@@ -405,7 +405,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     @Override
     protected void onSaveInstanceState(Bundle outState) {
 
-        Log.d(LOG_TAG, "Before rotating" + LocTextView.getText().toString());
+//        Log.d(LOG_TAG, "Before rotating" + LocTextView.getText().toString());
 
         outState.putString(KEY_LOCATION, LocTextView.getText().toString());
         outState.putParcelableArrayList("RES_LIST", resJSONdata);
@@ -420,8 +420,8 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     @Override
     protected void onStart() {
         super.onStart();
-
-        Log.d(LOG_TAG, "onStart");
+//
+//        Log.d(LOG_TAG, "onStart");
 
     }
 
@@ -429,7 +429,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
     protected void onResume() {
         super.onResume();
 
-        Log.d(LOG_TAG, "on resume");
+//        Log.d(LOG_TAG, "on resume");
 
         if (current_loc == false)
             LocTextView.setText(loc);
@@ -479,7 +479,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
             @Override
             public void onResponse(Response<ResSearchJSON> response, Retrofit retrofit) {
 
-                Log.v(LOG_TAG, "Restaurant search Response is " + response.body().getStatus());
+//                Log.v(LOG_TAG, "Restaurant search Response is " + response.body().getStatus());
 
                 resJSONdata = response.body().getResults();
                 res_data_count = resJSONdata.size();
@@ -522,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
                 for (Results result : resJSONdata) {
 
-                    Log.v(LOG_TAG, "Nearby Restaurant Name is " + result.getName());
+//                    Log.v(LOG_TAG, "Nearby Restaurant Name is " + result.getName());
 
                 }
 

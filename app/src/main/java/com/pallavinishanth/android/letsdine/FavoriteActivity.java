@@ -10,7 +10,6 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -62,7 +61,7 @@ public class FavoriteActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
 
-        Log.d(LOG_TAG, "onLoadFinished....");
+//        Log.d(LOG_TAG, "onLoadFinished....");
 
         if (cursor != null && cursor.getCount() > 0) {
 
