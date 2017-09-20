@@ -2,6 +2,7 @@
 
      Let's Dine is a restaurant finder app. User can find near by restaurants based on the location. On start of the application app identifies the current location and displays the list of near by locations. On select of any restaurant in the list opens the new screen with details about restaurant like restaurant address, open hours, URL, phone number, photos and user reviews along with ratings.
      On detail screen user has option to favorite any restaurant they like. List of all favorite restaurants can be seen on the favorite screen. Favorite screen shows on click of favorite symbol on main screen. User can favorite or unfavorite the restaurant.
+     App is provided with a widget to easily access the restaurant list. On click of widget item app opens up the detail page of that particular restaurant.
 
 ### Installation
 
