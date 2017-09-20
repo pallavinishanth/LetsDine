@@ -82,7 +82,7 @@ public class DetailActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.v(LOG_TAG, "OnCreate");
+//        Log.v(LOG_TAG, "OnCreate");
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.res_detail_view);
@@ -98,7 +98,7 @@ public class DetailActivity extends AppCompatActivity {
 
         placeID = getIntent().getStringExtra(PLACE_ID);
 
-        Log.v(LOG_TAG, "Place ID " + placeID);
+//        Log.v(LOG_TAG, "Place ID " + placeID);
 
         website_view = (TextView) findViewById(R.id.website_url);
         hours_view = (TextView) findViewById(R.id.hours);
@@ -132,7 +132,7 @@ public class DetailActivity extends AppCompatActivity {
 
             if (detail_result.getWebsite() != null) {
 
-                Log.v(LOG_TAG, "Place website " + detail_result.getWebsite());
+//                Log.v(LOG_TAG, "Place website " + detail_result.getWebsite());
                 website_view.setText(detail_result.getWebsite());
                 website_view.setContentDescription(detail_result.getWebsite());
 
@@ -153,7 +153,7 @@ public class DetailActivity extends AppCompatActivity {
 
             if (detail_result.getPhoneNum() != null) {
 
-                Log.v(LOG_TAG, detail_result.getPhoneNum());
+//                Log.v(LOG_TAG, detail_result.getPhoneNum());
                 phoneview.setText(detail_result.getPhoneNum());
                 phoneview.setContentDescription(detail_result.getPhoneNum());
 
@@ -184,7 +184,7 @@ public class DetailActivity extends AppCompatActivity {
                             + detail_result.getDetailOpeningHours().getweekhours()[5]
                             + detail_result.getDetailOpeningHours().getweekhours()[6]);
                     hours_view.append("\n");
-                    Log.v(LOG_TAG, "hours " + (detail_result.getDetailOpeningHours().getweekhours()[i]));
+//                    Log.v(LOG_TAG, "hours " + (detail_result.getDetailOpeningHours().getweekhours()[i]));
                 }
 
             } else {
@@ -194,7 +194,7 @@ public class DetailActivity extends AppCompatActivity {
 
             if (detail_result.getAddress() != null) {
 
-                Log.v(LOG_TAG, detail_result.getAddress());
+//                Log.v(LOG_TAG, detail_result.getAddress());
                 address.setText(detail_result.getAddress());
                 address.setContentDescription(detail_result.getAddress());
             } else {
@@ -217,8 +217,8 @@ public class DetailActivity extends AppCompatActivity {
 
             if (!detail_result.getPhotos().isEmpty()) {
 
-                Log.v(LOG_TAG, detail_result.getPhotos().get(0).getPhotoReference());
-                Log.v(LOG_TAG, String.format("size = %d", detail_result.getPhotos().size()));
+//                Log.v(LOG_TAG, detail_result.getPhotos().get(0).getPhotoReference());
+//                Log.v(LOG_TAG, String.format("size = %d", detail_result.getPhotos().size()));
                 photoslist = detail_result.getPhotos();
 
                 Glide.with(getBaseContext()).load("https://maps.googleapis.com/maps/api/place/photo?maxheight=380&photoreference="
@@ -236,9 +236,9 @@ public class DetailActivity extends AppCompatActivity {
             }
 
             if (!detail_result.getReviews().isEmpty()) {
-                Log.v(LOG_TAG, detail_result.getReviews().get(0).getAuthor_name());
-                Log.v(LOG_TAG, detail_result.getReviews().get(0).getText());
-                Log.v(LOG_TAG, String.format("Review Rating = %d", detail_result.getReviews().get(0).getRating()));
+//                Log.v(LOG_TAG, detail_result.getReviews().get(0).getAuthor_name());
+//                Log.v(LOG_TAG, detail_result.getReviews().get(0).getText());
+//                Log.v(LOG_TAG, String.format("Review Rating = %d", detail_result.getReviews().get(0).getRating()));
                 reviewslist = detail_result.getReviews();
 
                 resReviewAdapter = new ResReviewsAdapter(getBaseContext(), reviewslist);
@@ -278,7 +278,7 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
 
-        Log.d(LOG_TAG, "Before rotating" + detail_result.getname());
+//        Log.d(LOG_TAG, "Before rotating" + detail_result.getname());
 
         outState.putParcelable("DETAIL_RESULT", detail_result);
         outState.putBoolean("M_marked", markedFav);
@@ -289,7 +289,7 @@ public class DetailActivity extends AppCompatActivity {
 
     public Boolean ResMarkedFav(String place_id) {
 
-        Log.d(LOG_TAG, "ResMarkedFav " + place_id);
+//        Log.d(LOG_TAG, "ResMarkedFav " + place_id);
 
         Cursor cursor;
 
@@ -304,7 +304,7 @@ public class DetailActivity extends AppCompatActivity {
             return true;
     }
 
-    public boolean insertFavMovieData(String place_id, String name, String vicinity) {
+    public boolean insertFavResData(String place_id, String name, String vicinity) {
 
 
         ContentValues mvalues = new ContentValues();
@@ -313,7 +313,7 @@ public class DetailActivity extends AppCompatActivity {
         mvalues.put(ResContract.ResEntry.COLUMN_RES_NAME, name);
         mvalues.put(ResContract.ResEntry.COLUMN_RES_VICINITY, vicinity);
 
-        // Finally, insert movie data into the database.
+        // Finally, insert res data into the database.
         Uri insertedUri = getContentResolver().insert(
                 ResContract.ResEntry.CONTENT_URI,
                 mvalues);
@@ -321,7 +321,7 @@ public class DetailActivity extends AppCompatActivity {
         Long result_id = ContentUris.parseId(insertedUri);
 
         if (result_id > 0 && result_id != -1) {
-            Log.v(LOG_TAG, "Insertion Successfuly " + name);
+//            Log.v(LOG_TAG, "Insertion Successfuly " + name);
             return true;
 
         } else {
@@ -338,7 +338,7 @@ public class DetailActivity extends AppCompatActivity {
                 .delete(ResContract.ResEntry.buildFavResUri(placeid),
                         ResContract.ResEntry.COLUMN_PLACE_ID + "=" + "'" + placeid + "'", null);
 
-        Log.v(LOG_TAG, "Deleted Movie Data " + placeid + "rows " + no_rows_deleted);
+//        Log.v(LOG_TAG, "Deleted Res Data " + placeid + "rows " + no_rows_deleted);
 
         if (no_rows_deleted > 0) {
 
@@ -379,13 +379,13 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Response<ResDetailJSON> response, Retrofit retrofit) {
 
-                Log.v(LOG_TAG, "Restaurant Detail Response is " + response.body().getStatus());
+//                Log.v(LOG_TAG, "Restaurant Detail Response is " + response.body().getStatus());
 
                 detail_result = response.body().getResults();
 
                 if (detail_result.getWebsite() != null) {
 
-                    Log.v(LOG_TAG, "Place website " + detail_result.getWebsite());
+//                    Log.v(LOG_TAG, "Place website " + detail_result.getWebsite());
                     website_view.setText(detail_result.getWebsite());
                     website_view.setContentDescription(detail_result.getWebsite());
 
@@ -406,7 +406,7 @@ public class DetailActivity extends AppCompatActivity {
 
                 if (detail_result.getPhoneNum() != null) {
 
-                    Log.v(LOG_TAG, detail_result.getPhoneNum());
+//                    Log.v(LOG_TAG, detail_result.getPhoneNum());
                     phoneview.setText(detail_result.getPhoneNum());
                     phoneview.setContentDescription(detail_result.getPhoneNum());
 
@@ -437,7 +437,7 @@ public class DetailActivity extends AppCompatActivity {
                                 + detail_result.getDetailOpeningHours().getweekhours()[5]
                                 + detail_result.getDetailOpeningHours().getweekhours()[6]);
                         hours_view.append("\n");
-                        Log.v(LOG_TAG, "hours " + (detail_result.getDetailOpeningHours().getweekhours()[i]));
+//                        Log.v(LOG_TAG, "hours " + (detail_result.getDetailOpeningHours().getweekhours()[i]));
                     }
 
                 } else {
@@ -447,7 +447,7 @@ public class DetailActivity extends AppCompatActivity {
 
                 if (detail_result.getAddress() != null) {
 
-                    Log.v(LOG_TAG, detail_result.getAddress());
+//                    Log.v(LOG_TAG, detail_result.getAddress());
                     address.setText(detail_result.getAddress());
                     address.setContentDescription(detail_result.getAddress());
                 } else {
@@ -470,8 +470,8 @@ public class DetailActivity extends AppCompatActivity {
 
                 if (!detail_result.getPhotos().isEmpty()) {
 
-                    Log.v(LOG_TAG, detail_result.getPhotos().get(0).getPhotoReference());
-                    Log.v(LOG_TAG, String.format("size = %d", detail_result.getPhotos().size()));
+//                    Log.v(LOG_TAG, detail_result.getPhotos().get(0).getPhotoReference());
+//                    Log.v(LOG_TAG, String.format("size = %d", detail_result.getPhotos().size()));
                     photoslist = detail_result.getPhotos();
 
                     Glide.with(getBaseContext()).load("https://maps.googleapis.com/maps/api/place/photo?maxheight=380&photoreference="
@@ -489,9 +489,9 @@ public class DetailActivity extends AppCompatActivity {
                 }
 
                 if (!detail_result.getReviews().isEmpty()) {
-                    Log.v(LOG_TAG, detail_result.getReviews().get(0).getAuthor_name());
-                    Log.v(LOG_TAG, detail_result.getReviews().get(0).getText());
-                    Log.v(LOG_TAG, String.format("Review Rating = %d", detail_result.getReviews().get(0).getRating()));
+//                    Log.v(LOG_TAG, detail_result.getReviews().get(0).getAuthor_name());
+//                    Log.v(LOG_TAG, detail_result.getReviews().get(0).getText());
+//                    Log.v(LOG_TAG, String.format("Review Rating = %d", detail_result.getReviews().get(0).getRating()));
                     reviewslist = detail_result.getReviews();
 
                     resReviewAdapter = new ResReviewsAdapter(getBaseContext(), reviewslist);
@@ -550,7 +550,7 @@ public class DetailActivity extends AppCompatActivity {
                             }
                         } else {
 
-                            insert_result = insertFavMovieData(placeID, detail_result.getname(),
+                            insert_result = insertFavResData(placeID, detail_result.getname(),
                                     detail_result.getAddress());
 
                             if (insert_result) {
