@@ -317,10 +317,6 @@ public class MainActivity extends AppCompatActivity implements
                     case Activity.RESULT_OK:
                         // All required changes were successfully made
                         getLocation();
-
-                        Place place = PlaceAutocomplete.getPlace(this, data);
-//                Log.i(LOG_TAG, "Place: " + place.getName());
-                        this.onPlaceSelected(place);
                         break;
                     case Activity.RESULT_CANCELED:
                         // The user was asked to change settings, but chose not to
@@ -351,17 +347,19 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onPlaceSelected(Place place) {
 
-        Log.i(LOG_TAG, "Place Selected: " + place.getName());
+        if(place!=null){
 
-        loc = place.getName().toString();
+            Log.i(LOG_TAG, "Place Selected: " + place.getName());
 
-        LocTextView.setText(place.getName());
-        LatLng Sel_location = place.getLatLng();
-//
-//        current_loc = false;
-        _progressBar.setVisibility(ProgressBar.VISIBLE);
-        progressBarIsShowing = true;
-        retrofit_response(Sel_location.latitude + "," + Sel_location.longitude);
+            loc = place.getName().toString();
+
+            LocTextView.setText(place.getName());
+            LatLng Sel_location = place.getLatLng();
+            _progressBar.setVisibility(ProgressBar.VISIBLE);
+            progressBarIsShowing = true;
+            retrofit_response(Sel_location.latitude + "," + Sel_location.longitude);
+        }
+
     }
 
     @Override
