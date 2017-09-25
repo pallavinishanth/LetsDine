@@ -50,11 +50,14 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.maps.model.LatLng;
+import com.pallavinishanth.android.letsdine.Network.Photos;
 import com.pallavinishanth.android.letsdine.Network.ResRetrofitAPI;
 import com.pallavinishanth.android.letsdine.Network.ResSearchJSON;
 import com.pallavinishanth.android.letsdine.Network.Results;
-import com.pallavinishanth.android.letsdine.Network.Photos;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,7 +71,7 @@ import retrofit.Response;
 import retrofit.Retrofit;
 
 public class MainActivity extends AppCompatActivity implements
-        ConnectionCallbacks, OnConnectionFailedListener, LocationListener {
+        ConnectionCallbacks, OnConnectionFailedListener, LocationListener, PlaceSelectionListener {
 
     ProgressBar _progressBar;
     GoogleApiClient mGoogleApiClient;
@@ -90,6 +93,9 @@ public class MainActivity extends AppCompatActivity implements
     private RecyclerView.LayoutManager resLayoutManager;
     private ResDataAdapter resDataAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    static boolean current_loc = true;
+
+    static String loc;
 
     final String RES_DATA_API = "https://maps.googleapis.com/maps/";
     private int RADIUS = 10000;
@@ -98,6 +104,9 @@ public class MainActivity extends AppCompatActivity implements
 
     // Keys for storing activity state.
     private static final String KEY_LOCATION = "location";
+
+    public double default_latitude = 42.359799;
+    public double default_longitude = -71.054460;
 
 
     @Override
@@ -123,10 +132,56 @@ public class MainActivity extends AppCompatActivity implements
                 .addApi(LocationServices.API)
                 .build();
 
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.connect();
-        } else
-            Toast.makeText(this, "Not Connected!", Toast.LENGTH_SHORT).show();
+        if (savedInstanceState != null) {
+
+            LocTextView.setText(savedInstanceState.getString(KEY_LOCATION));
+            resJSONdata = savedInstanceState.getParcelableArrayList("RES_LIST");
+            progressBarIsShowing = savedInstanceState.getBoolean("progressBarIsShowing");
+//            Log.d(LOG_TAG, "After rotating" + LocTextView.getText().toString());
+//            Log.d(LOG_TAG, "After rotating" + resJSONdata.get(1).getName().toString());
+
+            resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+            resRecyclerView.setHasFixedSize(true);
+
+            resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+            resRecyclerView.setLayoutManager(resLayoutManager);
+
+            resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
+            resRecyclerView.setAdapter(resDataAdapter);
+
+            resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(View itemView, int position) {
+
+//                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
+
+                    Results res_results_card = resJSONdata.get(position);
+
+                    ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
+
+                    Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                    i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        Bundle bundle = ActivityOptionsCompat
+                                .makeSceneTransitionAnimation(MainActivity.this)
+                                .toBundle();
+
+                        startActivity(i, bundle);
+                    } else {
+                        startActivity(i);
+                    }
+
+                }
+            });
+        }else{
+            if (mGoogleApiClient != null) {
+                mGoogleApiClient.connect();
+            } else
+                Toast.makeText(this, "Not Connected!", Toast.LENGTH_SHORT).show();
+        }
+
 
         currloc.setOnClickListener(new View.OnClickListener(){
 
@@ -160,13 +215,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        if (savedInstanceState != null) {
-            LocTextView.setText(savedInstanceState.getString(KEY_LOCATION));
-            resJSONdata = savedInstanceState.getParcelableArrayList("RES_LIST");
-            progressBarIsShowing = savedInstanceState.getBoolean("progressBarIsShowing");
-//            Log.d(LOG_TAG, "After rotating" + LocTextView.getText().toString());
-//            Log.d(LOG_TAG, "After rotating" + resJSONdata.get(1).getName().toString());
-        }
+
     }
 
     /*Ending the updates for the location service*/
@@ -175,6 +224,17 @@ public class MainActivity extends AppCompatActivity implements
         mGoogleApiClient.disconnect();
         super.onStop();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+//        Log.d(LOG_TAG, "on resume");
+
+//        if (current_loc == false)
+//            LocTextView.setText(loc);
+    }
+
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -257,6 +317,10 @@ public class MainActivity extends AppCompatActivity implements
                     case Activity.RESULT_OK:
                         // All required changes were successfully made
                         getLocation();
+
+                        Place place = PlaceAutocomplete.getPlace(this, data);
+//                Log.i(LOG_TAG, "Place: " + place.getName());
+                        this.onPlaceSelected(place);
                         break;
                     case Activity.RESULT_CANCELED:
                         // The user was asked to change settings, but chose not to
@@ -265,8 +329,48 @@ public class MainActivity extends AppCompatActivity implements
                     default:
                         break;
                 }
+            case PLACE_AUTOCOMPLETE_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    Place place = PlaceAutocomplete.getPlace(this, data);
+//                Log.i(LOG_TAG, "Place: " + place.getName());
+                    this.onPlaceSelected(place);
+                } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                    Status status = PlaceAutocomplete.getStatus(this, data);
+//                Log.i(LOG_TAG, status.getStatusMessage());
+                    this.onError(status);
+
+                } else if (resultCode == RESULT_CANCELED) {
+                    // The user canceled the operation.
+//                Log.i(LOG_TAG, "User Canceled the operation ");
+                }
                 break;
         }
+    }
+
+
+    @Override
+    public void onPlaceSelected(Place place) {
+
+        Log.i(LOG_TAG, "Place Selected: " + place.getName());
+
+        loc = place.getName().toString();
+
+        LocTextView.setText(place.getName());
+        LatLng Sel_location = place.getLatLng();
+//
+//        current_loc = false;
+        _progressBar.setVisibility(ProgressBar.VISIBLE);
+        progressBarIsShowing = true;
+        retrofit_response(Sel_location.latitude + "," + Sel_location.longitude);
+    }
+
+    @Override
+    public void onError(Status status) {
+
+        Log.e(LOG_TAG, "onError: Status = " + status.toString());
+        Toast.makeText(this, R.string.loc_sel_failed + status.getStatusMessage(),
+                Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
@@ -291,6 +395,8 @@ public class MainActivity extends AppCompatActivity implements
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                     Log.v(LOG_TAG, "Permissionsdenied");
+                    mLocationPermissionGranted = false;
+                    getLatLong();
                 }
                 return;
             }
@@ -341,14 +447,14 @@ public class MainActivity extends AppCompatActivity implements
             e.printStackTrace();
 
         }
-        if (resJSONdata.isEmpty()) {
+//        if (current_loc == true && resJSONdata.isEmpty()) {
 
 //                    Log.d(LOG_TAG, "calling retrofit...");
 //                    Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
             _progressBar.setVisibility(ProgressBar.VISIBLE);
             progressBarIsShowing = true;
             retrofit_response(latitude + "," + longitude);
-        }
+//        }
 
         resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         resRecyclerView.setHasFixedSize(true);
@@ -416,14 +522,14 @@ public class MainActivity extends AppCompatActivity implements
                         e.printStackTrace();
 
                     }
-                    if (resJSONdata.isEmpty()) {
+//                    if (current_loc == true && resJSONdata.isEmpty()) {
 
 //                    Log.d(LOG_TAG, "calling retrofit...");
 //                    Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
                         _progressBar.setVisibility(ProgressBar.VISIBLE);
                         progressBarIsShowing = true;
                         retrofit_response(latitude + "," + longitude);
-                    }
+//                    }
 
                     resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
                     resRecyclerView.setHasFixedSize(true);
@@ -471,11 +577,94 @@ public class MainActivity extends AppCompatActivity implements
 
                     LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, MainActivity.this);
                 }
+            }else{
+
+                Log.v(LOG_TAG, "if permissions denied by user...");
+                Geocoder gcd = new Geocoder(this, Locale.getDefault());
+                List<Address> addresses;
+
+                try {
+                    addresses = gcd.getFromLocation(default_latitude, default_longitude, 1);
+                    if (addresses.size() > 0) {
+                        cityname = addresses.get(0).getLocality().toString();
+                        //state = addresses.get(0).getAdminArea().toString();
+
+//                        Log.d(LOG_TAG, "After back button pressed");
+                        LocTextView.setText(cityname);
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+
+                }
+
+//                if (current_loc == true && resJSONdata.isEmpty()) {
+
+//                    Log.d(LOG_TAG, "calling retrofit...");
+//                    Log.d(LOG_TAG, "latitude : " + default_longitude + "longitude : " + default_longitude);
+                    _progressBar.setVisibility(ProgressBar.VISIBLE);
+                    progressBarIsShowing = true;
+                    retrofit_response(default_latitude + "," + default_longitude);
+//                }
+
+                resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+                resRecyclerView.setHasFixedSize(true);
+
+                resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+                resRecyclerView.setLayoutManager(resLayoutManager);
+
+                resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
+                resRecyclerView.setAdapter(resDataAdapter);
+
+                resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener() {
+
+                    @Override
+                    public void onItemClick(View itemView, int position) {
+
+//                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
+
+                        Results res_results_card = resJSONdata.get(position);
+
+                        ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
+
+                        Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                        i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            Bundle bundle = ActivityOptionsCompat
+                                    .makeSceneTransitionAnimation(MainActivity.this)
+                                    .toBundle();
+
+                            startActivity(i, bundle);
+                        } else {
+                            startActivity(i);
+                        }
+
+                    }
+                });
             }
 
         }catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
+    }
+
+    /**
+     * Saves the location when the activity is paused.
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        Log.d(LOG_TAG, "Before rotating" + LocTextView.getText().toString());
+
+        outState.putString(KEY_LOCATION, LocTextView.getText().toString());
+        outState.putParcelableArrayList("RES_LIST", resJSONdata);
+        if (progressBarIsShowing) {
+            outState.putBoolean("progressBarIsShowing", progressBarIsShowing);
+        }
+
+        super.onSaveInstanceState(outState);
+
     }
 
     @Override
