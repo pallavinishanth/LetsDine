@@ -93,7 +93,8 @@ public class MainActivity extends AppCompatActivity implements
     private RecyclerView.LayoutManager resLayoutManager;
     private ResDataAdapter resDataAdapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    static boolean current_loc = true;
+    static boolean current_loc = false;
+    static boolean loc_changed = false;
 
     static String loc;
 
@@ -133,6 +134,20 @@ public class MainActivity extends AppCompatActivity implements
                 .build();
 
         if (savedInstanceState != null) {
+
+            Log.v(LOG_TAG, "After rotation... savedInstanceState != null");
+
+            currloc.setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(MainActivity.this, "Location Updated", Toast.LENGTH_SHORT).show();
+                    current_loc = true;
+
+                    if (mGoogleApiClient != null)
+                        mGoogleApiClient.connect();
+                }
+            });
 
             LocTextView.setText(savedInstanceState.getString(KEY_LOCATION));
             resJSONdata = savedInstanceState.getParcelableArrayList("RES_LIST");
@@ -188,6 +203,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this, "Location Updated", Toast.LENGTH_SHORT).show();
+                current_loc = true;
 
                 if (mGoogleApiClient != null)
                     mGoogleApiClient.connect();
@@ -198,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
 
+                loc_changed = true;
                 try {
 
                     AutocompleteFilter locationFilter = new AutocompleteFilter.Builder()
@@ -325,6 +342,7 @@ public class MainActivity extends AppCompatActivity implements
                     default:
                         break;
                 }
+                break;
             case PLACE_AUTOCOMPLETE_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
                     Place place = PlaceAutocomplete.getPlace(this, data);
@@ -347,8 +365,9 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onPlaceSelected(Place place) {
 
-        if(place!=null){
+//        if(place!=null){
 
+            loc_changed = true;
             Log.i(LOG_TAG, "Place Selected: " + place.getName());
 
             loc = place.getName().toString();
@@ -358,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements
             _progressBar.setVisibility(ProgressBar.VISIBLE);
             progressBarIsShowing = true;
             retrofit_response(Sel_location.latitude + "," + Sel_location.longitude);
-        }
+//        }
 
     }
 
@@ -424,28 +443,33 @@ public class MainActivity extends AppCompatActivity implements
     /*When Location changes, this method get called. */
     @Override
     public void onLocationChanged(Location location) {
+
+        Log.v(LOG_TAG, "onLocationChanged###############" + "current_loc" + current_loc + "loc_changed"+ loc_changed);
         mLastLocation = location;
         _progressBar.setVisibility(View.INVISIBLE);
         latitude = mLastLocation.getLatitude();
         longitude = mLastLocation.getLongitude();
 
-        Log.v(LOG_TAG, "latitude...." + latitude + "longitude...." + longitude);
+        if(loc_changed==false && resJSONdata.isEmpty()) {
 
-        Geocoder gcd = new Geocoder(this, Locale.getDefault());
-        List<Address> addresses;
+            Log.v(LOG_TAG, "latitude...." + latitude + "longitude...." + longitude);
 
-        try {
-            addresses = gcd.getFromLocation(latitude, longitude, 1);
-            if (addresses.size() > 0) {
-                cityname = addresses.get(0).getLocality().toString();
-                LocTextView.setText(cityname);
+            Geocoder gcd = new Geocoder(this, Locale.getDefault());
+            List<Address> addresses;
+
+            try {
+                addresses = gcd.getFromLocation(latitude, longitude, 1);
+                if (addresses.size() > 0) {
+                    cityname = addresses.get(0).getLocality().toString();
+
+                    LocTextView.setText(cityname);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-
-        }
-//        if (current_loc == true && resJSONdata.isEmpty()) {
+//        if (current_loc==false) {
 
 //                    Log.d(LOG_TAG, "calling retrofit...");
 //                    Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
@@ -454,41 +478,108 @@ public class MainActivity extends AppCompatActivity implements
             retrofit_response(latitude + "," + longitude);
 //        }
 
-        resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        resRecyclerView.setHasFixedSize(true);
+            resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+            resRecyclerView.setHasFixedSize(true);
 
-        resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        resRecyclerView.setLayoutManager(resLayoutManager);
+            resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+            resRecyclerView.setLayoutManager(resLayoutManager);
 
-        resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
-        resRecyclerView.setAdapter(resDataAdapter);
+            resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
+            resRecyclerView.setAdapter(resDataAdapter);
 
-        resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener() {
+            resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener() {
 
-            @Override
-            public void onItemClick(View itemView, int position) {
+                @Override
+                public void onItemClick(View itemView, int position) {
 
 //                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
 
-                Results res_results_card = resJSONdata.get(position);
+                    Results res_results_card = resJSONdata.get(position);
 
-                ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
+                    ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
 
-                Intent i = new Intent(MainActivity.this, DetailActivity.class);
-                i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
+                    Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                    i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Bundle bundle = ActivityOptionsCompat
-                            .makeSceneTransitionAnimation(MainActivity.this)
-                            .toBundle();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        Bundle bundle = ActivityOptionsCompat
+                                .makeSceneTransitionAnimation(MainActivity.this)
+                                .toBundle();
 
-                    startActivity(i, bundle);
-                } else {
-                    startActivity(i);
+                        startActivity(i, bundle);
+                    } else {
+                        startActivity(i);
+                    }
+
+                }
+            });
+        }
+
+        if(current_loc==true){
+
+            Log.v(LOG_TAG, "latitude...." + latitude + "longitude...." + longitude);
+
+            Geocoder gcd = new Geocoder(this, Locale.getDefault());
+            List<Address> addresses;
+
+            try {
+                addresses = gcd.getFromLocation(latitude, longitude, 1);
+                if (addresses.size() > 0) {
+                    cityname = addresses.get(0).getLocality().toString();
+
+                    LocTextView.setText(cityname);
                 }
 
+            } catch (IOException e) {
+                e.printStackTrace();
+
             }
-        });
+//        if (current_loc==false) {
+
+//                    Log.d(LOG_TAG, "calling retrofit...");
+//                    Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
+            _progressBar.setVisibility(ProgressBar.VISIBLE);
+            progressBarIsShowing = true;
+            retrofit_response(latitude + "," + longitude);
+//        }
+
+            resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+            resRecyclerView.setHasFixedSize(true);
+
+            resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+            resRecyclerView.setLayoutManager(resLayoutManager);
+
+            resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
+            resRecyclerView.setAdapter(resDataAdapter);
+
+            resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(View itemView, int position) {
+
+//                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
+
+                    Results res_results_card = resJSONdata.get(position);
+
+                    ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
+
+                    Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                    i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        Bundle bundle = ActivityOptionsCompat
+                                .makeSceneTransitionAnimation(MainActivity.this)
+                                .toBundle();
+
+                        startActivity(i, bundle);
+                    } else {
+                        startActivity(i);
+                    }
+
+                }
+            });
+        }
+        current_loc = false;
     }
 
     public void getLatLong() {
@@ -520,14 +611,14 @@ public class MainActivity extends AppCompatActivity implements
                         e.printStackTrace();
 
                     }
-//                    if (current_loc == true && resJSONdata.isEmpty()) {
+                    if (current_loc==true || resJSONdata.isEmpty()) {
 
 //                    Log.d(LOG_TAG, "calling retrofit...");
 //                    Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
-                        _progressBar.setVisibility(ProgressBar.VISIBLE);
-                        progressBarIsShowing = true;
-                        retrofit_response(latitude + "," + longitude);
-//                    }
+                    _progressBar.setVisibility(ProgressBar.VISIBLE);
+                    progressBarIsShowing = true;
+                    retrofit_response(latitude + "," + longitude);
+                    }
 
                     resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
                     resRecyclerView.setHasFixedSize(true);
@@ -596,14 +687,14 @@ public class MainActivity extends AppCompatActivity implements
 
                 }
 
-//                if (current_loc == true && resJSONdata.isEmpty()) {
+                if (current_loc==true || resJSONdata.isEmpty()) {
 
 //                    Log.d(LOG_TAG, "calling retrofit...");
 //                    Log.d(LOG_TAG, "latitude : " + default_longitude + "longitude : " + default_longitude);
                     _progressBar.setVisibility(ProgressBar.VISIBLE);
                     progressBarIsShowing = true;
                     retrofit_response(default_latitude + "," + default_longitude);
-//                }
+                }
 
                 resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
                 resRecyclerView.setHasFixedSize(true);
@@ -709,7 +800,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onResponse(Response<ResSearchJSON> response, Retrofit retrofit) {
 
-//                Log.v(LOG_TAG, "Restaurant search Response is " + response.body().getStatus());
+                Log.v(LOG_TAG, "Restaurant search Response is " + response.body().getStatus());
 
                 resJSONdata = response.body().getResults();
                 res_data_count = resJSONdata.size();
@@ -752,7 +843,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 for (Results result : resJSONdata) {
 
-//                    Log.v(LOG_TAG, "Nearby Restaurant Name is " + result.getName());
+                    Log.v(LOG_TAG, "Nearby Restaurant Name is " + result.getName());
 
                 }
 
