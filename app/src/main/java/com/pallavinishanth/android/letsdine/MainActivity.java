@@ -1,21 +1,22 @@
 package com.pallavinishanth.android.letsdine;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.content.IntentSender.SendIntentException;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
-import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -27,13 +28,27 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
@@ -55,75 +70,145 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-import static com.pallavinishanth.android.letsdine.R.layout.activity_main;
+public class MainActivity extends AppCompatActivity implements
+        ConnectionCallbacks, OnConnectionFailedListener, LocationListener, PlaceSelectionListener {
 
-public class MainActivity extends AppCompatActivity implements PlaceSelectionListener {
-
-    private final String LOG_TAG = MainActivity.class.getSimpleName();
-    private boolean mLocationPermissionGranted;
+    ProgressBar _progressBar;
+    GoogleApiClient mGoogleApiClient;
+    Location mLastLocation;
+    boolean progressBarIsShowing;
+    private CoordinatorLayout mCLayout;
+    LocationRequest mLocationRequest;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-
-    // Keys for storing activity state.
-    private static final String KEY_LOCATION = "location";
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 100;
-
-    TextView LocTextView;
-    String cityname;
-    private Location location;
+    private boolean mLocationPermissionGranted;
+    private final String LOG_TAG = MainActivity.class.getSimpleName();
     public static double latitude;
     public static double longitude;
-    public LocationManager locationManager;
-    Criteria criteria;
-
-    public double default_latitude = 42.359799;
-    public double default_longitude = -71.054460;
-
-    String state;
-    static boolean current_loc = true;
-
-    static String loc;
-
-    static int i = 0;
-
-    final String RES_DATA_API = "https://maps.googleapis.com/maps/";
-    private int RADIUS = 10000;
-    private static ArrayList<Results> resJSONdata = new ArrayList<>();
-
+    TextView LocTextView;
+    String cityname;
+    ImageView currloc;
     private Toolbar mToolbar;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView resRecyclerView;
     private RecyclerView.LayoutManager resLayoutManager;
     private ResDataAdapter resDataAdapter;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    static boolean current_loc = false;
+    static boolean loc_changed = false;
+
+    static String loc;
+
+    final String RES_DATA_API = "https://maps.googleapis.com/maps/";
+    private int RADIUS = 10000;
     static int res_data_count;
-    ProgressBar progress_bar;
-    boolean progressBarIsShowing;
-    private CoordinatorLayout mCLayout;
+    private static ArrayList<Results> resJSONdata = new ArrayList<>();
+
+    // Keys for storing activity state.
+    private static final String KEY_LOCATION = "location";
+
+    public double default_latitude = 42.359799;
+    public double default_longitude = -71.054460;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        Log.d(LOG_TAG, "onCreate");
-        setContentView(activity_main);
+        setContentView(R.layout.activity_main);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(true);
 
+        LocTextView = (TextView) findViewById(R.id.location);
+        currloc = (ImageView) findViewById(R.id.currentloc_icon);
+
+        _progressBar = (ProgressBar) findViewById(R.id.progressBar);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        progress_bar = (ProgressBar) findViewById(R.id.progressBar);
         mCLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
 
-        LocTextView = (TextView) findViewById(R.id.location);
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
 
-        getLocation();
+        if (savedInstanceState != null) {
+
+//            Log.v(LOG_TAG, "After rotation... savedInstanceState != null");
+
+            LocTextView.setText(savedInstanceState.getString(KEY_LOCATION));
+            resJSONdata = savedInstanceState.getParcelableArrayList("RES_LIST");
+            progressBarIsShowing = savedInstanceState.getBoolean("progressBarIsShowing");
+//            Log.d(LOG_TAG, "After rotating" + LocTextView.getText().toString());
+//            Log.d(LOG_TAG, "After rotating" + resJSONdata.get(1).getName().toString());
+
+            resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+            resRecyclerView.setHasFixedSize(true);
+
+            resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+            resRecyclerView.setLayoutManager(resLayoutManager);
+
+            resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
+            resRecyclerView.setAdapter(resDataAdapter);
+
+            resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(View itemView, int position) {
+
+//                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
+
+                    Results res_results_card = resJSONdata.get(position);
+
+                    ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
+
+                    Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                    i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        Bundle bundle = ActivityOptionsCompat
+                                .makeSceneTransitionAnimation(MainActivity.this)
+                                .toBundle();
+
+                        startActivity(i, bundle);
+                    } else {
+                        startActivity(i);
+                    }
+
+                }
+            });
+        }else{
+//            Log.v(LOG_TAG, "savedInstanceState ===== null");
+
+            if (mGoogleApiClient != null) {
+                mGoogleApiClient.connect();
+            } else
+                Toast.makeText(this, "Not Connected!", Toast.LENGTH_SHORT).show();
+
+        }
+
+        currloc.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View view) {
+
+//                Log.v(LOG_TAG, "current location clicked..........");
+                Toast.makeText(MainActivity.this, "Location Updated", Toast.LENGTH_SHORT).show();
+                current_loc = true;
+
+                if (mGoogleApiClient != null)
+                    mGoogleApiClient.connect();
+
+//                getLocation();
+            }
+        });
 
         LocTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                loc_changed = true;
                 try {
 
                     AutocompleteFilter locationFilter = new AutocompleteFilter.Builder()
@@ -141,262 +226,435 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
             }
         });
 
-        // Retrieve location from saved instance state.
-        if (savedInstanceState != null) {
-            LocTextView.setText(savedInstanceState.getString(KEY_LOCATION));
-            resJSONdata = savedInstanceState.getParcelableArrayList("RES_LIST");
-            progressBarIsShowing = savedInstanceState.getBoolean("progressBarIsShowing");
-//            Log.d(LOG_TAG, "After rotating" + LocTextView.getText().toString());
-//            Log.d(LOG_TAG, "After rotating" + resJSONdata.get(1).getName().toString());
-        }
+
+    }
+
+    /*Ending the updates for the location service*/
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
     }
 
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                Place place = PlaceAutocomplete.getPlace(this, data);
-//                Log.i(LOG_TAG, "Place: " + place.getName());
-                this.onPlaceSelected(place);
-            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
-                Status status = PlaceAutocomplete.getStatus(this, data);
-//                Log.i(LOG_TAG, status.getStatusMessage());
-                this.onError(status);
+    public void onConnected(@Nullable Bundle bundle) {
+        settingRequest();
+    }
 
-            } else if (resultCode == RESULT_CANCELED) {
-                // The user canceled the operation.
-//                Log.i(LOG_TAG, "User Canceled the operation ");
+    @Override
+    public void onConnectionSuspended(int i) {
+        Toast.makeText(this, "Connection Suspended!", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Toast.makeText(this, "Connection Failed!", Toast.LENGTH_SHORT).show();
+        if (connectionResult.hasResolution()) {
+            try {
+                // Start an Activity that tries to resolve the error
+                connectionResult.startResolutionForResult(this, 90000);
+            } catch (IntentSender.SendIntentException e) {
+                e.printStackTrace();
             }
+        } else {
+            Log.i("Current Location", "Location services connection failed with code " + connectionResult.getErrorCode());
         }
+    }
+
+    /*Method to get the enable location settings dialog*/
+    public void settingRequest() {
+
+//        Log.v(LOG_TAG, "settingRequest..........");
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);    // 10 seconds, in milliseconds
+        mLocationRequest.setFastestInterval(1000);   // 1 second, in milliseconds
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(mLocationRequest);
+
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient,
+                        builder.build());
+
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+
+            @Override
+            public void onResult(@NonNull LocationSettingsResult result) {
+                final Status status = result.getStatus();
+                final LocationSettingsStates state = result.getLocationSettingsStates();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        // All location settings are satisfied. The client can
+                        // initialize location requests here.
+                        getLocation();
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied, but this can be fixed
+                        // by showing the user a dialog.
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            status.startResolutionForResult(MainActivity.this, 1000);
+                        } catch (SendIntentException e) {
+                            // Ignore the error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way
+                        // to fix the settings so we won't show the dialog.
+                        break;
+                }
+            }
+
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        final LocationSettingsStates states = LocationSettingsStates.fromIntent(data);
+        switch (requestCode) {
+            case 1000:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        // All required changes were successfully made
+                        getLocation();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        // The user was asked to change settings, but chose not to
+                        Toast.makeText(this, "Location Service not Enabled", Toast.LENGTH_SHORT).show();
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case PLACE_AUTOCOMPLETE_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    Place place = PlaceAutocomplete.getPlace(this, data);
+//                Log.i(LOG_TAG, "Place: " + place.getName());
+                    this.onPlaceSelected(place);
+                } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                    Status status = PlaceAutocomplete.getStatus(this, data);
+//                Log.i(LOG_TAG, status.getStatusMessage());
+                    this.onError(status);
+
+                } else if (resultCode == RESULT_CANCELED) {
+                    // The user canceled the operation.
+//                Log.i(LOG_TAG, "User Canceled the operation ");
+                }
+                break;
+        }
+    }
+
+
+    @Override
+    public void onPlaceSelected(Place place) {
+
+            loc_changed = true;
+//            Log.i(LOG_TAG, "Place Selected: " + place.getName());
+
+            loc = place.getName().toString();
+
+            LocTextView.setText(place.getName());
+            LatLng Sel_location = place.getLatLng();
+            _progressBar.setVisibility(ProgressBar.VISIBLE);
+            progressBarIsShowing = true;
+            retrofit_response(Sel_location.latitude + "," + Sel_location.longitude);
+
+    }
+
+    @Override
+    public void onError(Status status) {
+
+//        Log.e(LOG_TAG, "onError: Status = " + status.toString());
+        Toast.makeText(this, R.string.loc_sel_failed + status.getStatusMessage(),
+                Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
+                                           String permissions[], int[] grantResults) {
 
-//        Log.d(LOG_TAG, "onRequestPermissionsResult");
         mLocationPermissionGranted = false;
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+//                    Log.v(LOG_TAG, "Permissionsgranted");
                     mLocationPermissionGranted = true;
+                    getLatLong();
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+//                    Log.v(LOG_TAG, "Permissionsdenied");
+                    mLocationPermissionGranted = false;
+                    getLatLong();
                 }
+                return;
             }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
         }
-        getLatLong();
     }
 
     public void getLocation() {
 
-//        Log.d(LOG_TAG, "getLocation");
+//        Log.v(LOG_TAG, "getLocation.......");
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-        //Location Manager is used to figure out which location provider needs to be used.
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        //Best location provider is decided by the criteria
-        criteria = new Criteria();
-        //location manager will take the best location from the criteria
-        locationManager.getBestProvider(criteria, true);
-
-        //once you know the name of the LocationProvider, you can call getLastKnownPosition()
-        // to find out where you were recently.
-
-        // Checking the permissions
-        if (ContextCompat.checkSelfPermission(this.getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            mLocationPermissionGranted = true;
-            getLatLong();
-        } else {
+//            Log.v(LOG_TAG, "requestPermissions");
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
+        } else {
 
+            mLocationPermissionGranted = true;
+
+//            Log.v(LOG_TAG, "defaultPermissionsgranted");
+            getLatLong();
+        }
+    }
+
+
+    /*When Location changes, this method get called. */
+    @Override
+    public void onLocationChanged(Location location) {
+
+//        Log.v(LOG_TAG, "onLocationChanged###############" + "current_loc" + current_loc + "loc_changed"+ loc_changed);
+        mLastLocation = location;
+        _progressBar.setVisibility(View.INVISIBLE);
+        latitude = mLastLocation.getLatitude();
+        longitude = mLastLocation.getLongitude();
+
+        if(current_loc==true || resJSONdata.isEmpty()){
+
+//            Log.v(LOG_TAG, "latitude...." + latitude + "longitude...." + longitude);
+
+            Geocoder gcd = new Geocoder(this, Locale.getDefault());
+            List<Address> addresses;
+
+            try {
+                addresses = gcd.getFromLocation(latitude, longitude, 1);
+                if (addresses.size() > 0) {
+                    cityname = addresses.get(0).getLocality().toString();
+
+                    LocTextView.setText(cityname);
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+
+            }
+            _progressBar.setVisibility(ProgressBar.VISIBLE);
+            progressBarIsShowing = true;
+            retrofit_response(latitude + "," + longitude);
+
+            resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+            resRecyclerView.setHasFixedSize(true);
+
+            resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+            resRecyclerView.setLayoutManager(resLayoutManager);
+
+            resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
+            resRecyclerView.setAdapter(resDataAdapter);
+
+            resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(View itemView, int position) {
+
+//                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
+
+                    Results res_results_card = resJSONdata.get(position);
+
+                    ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
+
+                    Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                    i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        Bundle bundle = ActivityOptionsCompat
+                                .makeSceneTransitionAnimation(MainActivity.this)
+                                .toBundle();
+
+                        startActivity(i, bundle);
+                    } else {
+                        startActivity(i);
+                    }
+
+                }
+            });
+        }
+        current_loc = false;
     }
 
     public void getLatLong() {
 
-        try {
+//        Log.v(LOG_TAG, "getLatLong..........");
+
+        try{
             if (mLocationPermissionGranted) {
+                /*Getting the location after aquiring location service*/
+                mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                        mGoogleApiClient);
 
-//                Log.d(LOG_TAG, "mLocationPermissionGranted true");
+                if (mLastLocation != null) {
+                    _progressBar.setVisibility(View.INVISIBLE);
+                    latitude = mLastLocation.getLatitude();
+                    longitude = mLastLocation.getLongitude();
 
-                location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
+                    if (current_loc==true || resJSONdata.isEmpty()) {
+//                        Log.v(LOG_TAG, "latitude" + latitude + "longitude" + longitude);
 
-                if (location != null) {
+                        Geocoder gcd = new Geocoder(this, Locale.getDefault());
+                        List<Address> addresses;
 
-                    latitude = location.getLatitude();
-                    longitude = location.getLongitude();
+                        try {
+                            addresses = gcd.getFromLocation(latitude, longitude, 1);
+                            if (addresses.size() > 0) {
+                                cityname = addresses.get(0).getLocality().toString();
+                                LocTextView.setText(cityname);
+                            }
 
-//                    Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
-                } else {
+                        } catch (IOException e) {
+                            e.printStackTrace();
 
-                    latitude = default_latitude;
-                    longitude = default_longitude;
-                }
+                        }
 
-                Geocoder gcd = new Geocoder(this, Locale.getDefault());
-                List<Address> addresses;
+                        _progressBar.setVisibility(ProgressBar.VISIBLE);
+                        progressBarIsShowing = true;
+                        retrofit_response(latitude + "," + longitude);
 
-                try {
-                    addresses = gcd.getFromLocation(latitude, longitude, 1);
-                    if (addresses.size() > 0) {
-                        cityname = addresses.get(0).getLocality().toString();
-                        //state = addresses.get(0).getAdminArea().toString();
-//
-//                        Log.d(LOG_TAG, "After back button pressed");
-                        LocTextView.setText(cityname);
-                    }
+                        resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+                        resRecyclerView.setHasFixedSize(true);
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                        resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+                        resRecyclerView.setLayoutManager(resLayoutManager);
 
-                }
+                        resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
+                        resRecyclerView.setAdapter(resDataAdapter);
 
-                if (current_loc == true && resJSONdata.isEmpty()) {
+                        resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener() {
 
-//                    Log.d(LOG_TAG, "calling retrofit...");
-//                    Log.d(LOG_TAG, "latitude : " + latitude + "longitude : " + longitude);
-                    progress_bar.setVisibility(ProgressBar.VISIBLE);
-                    progressBarIsShowing = true;
-                    retrofit_response(latitude + "," + longitude);
-                }
-
-                resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-                resRecyclerView.setHasFixedSize(true);
-
-                resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-                resRecyclerView.setLayoutManager(resLayoutManager);
-
-                resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
-                resRecyclerView.setAdapter(resDataAdapter);
-
-                resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener() {
-
-                    @Override
-                    public void onItemClick(View itemView, int position) {
+                            @Override
+                            public void onItemClick(View itemView, int position) {
 
 //                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
 
-                        Results res_results_card = resJSONdata.get(position);
+                                Results res_results_card = resJSONdata.get(position);
 
-                        ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
+                                ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
 
-                        Intent i = new Intent(MainActivity.this, DetailActivity.class);
-                        i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
+                                Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                                i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            Bundle bundle = ActivityOptionsCompat
-                                    .makeSceneTransitionAnimation(MainActivity.this)
-                                    .toBundle();
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    Bundle bundle = ActivityOptionsCompat
+                                            .makeSceneTransitionAnimation(MainActivity.this)
+                                            .toBundle();
 
-                            startActivity(i, bundle);
-                        } else {
-                            startActivity(i);
-                        }
+                                    startActivity(i, bundle);
+                                } else {
+                                    startActivity(i);
+                                }
 
+                            }
+                        });
                     }
-                });
+                } else {
+                /*if there is no last known location. Which means the device has no data for the loction currently.
+                * So we will get the current location.
+                * For this we'll implement Location Listener and override onLocationChanged*/
+                    Log.i("Current Location", "No data for location found");
 
-            } else {
+                    if (!mGoogleApiClient.isConnected())
+                        mGoogleApiClient.connect();
 
-                Geocoder gcd = new Geocoder(this, Locale.getDefault());
-                List<Address> addresses;
+                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, MainActivity.this);
+                }
+            }else{
 
-                try {
-                    addresses = gcd.getFromLocation(default_latitude, default_longitude, 1);
-                    if (addresses.size() > 0) {
-                        cityname = addresses.get(0).getLocality().toString();
-                        //state = addresses.get(0).getAdminArea().toString();
+//                Log.v(LOG_TAG, "if permissions denied by user...");
+
+                if (current_loc==true || resJSONdata.isEmpty()) {
+                    Geocoder gcd = new Geocoder(this, Locale.getDefault());
+                    List<Address> addresses;
+
+                    try {
+                        addresses = gcd.getFromLocation(default_latitude, default_longitude, 1);
+                        if (addresses.size() > 0) {
+                            cityname = addresses.get(0).getLocality().toString();
+                            //state = addresses.get(0).getAdminArea().toString();
 
 //                        Log.d(LOG_TAG, "After back button pressed");
-                        LocTextView.setText(cityname);
+                            LocTextView.setText(cityname);
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+
                     }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-
-                }
-
-                if (current_loc == true && resJSONdata.isEmpty()) {
-
-//                    Log.d(LOG_TAG, "calling retrofit...");
-//                    Log.d(LOG_TAG, "latitude : " + default_longitude + "longitude : " + default_longitude);
-                    progress_bar.setVisibility(ProgressBar.VISIBLE);
+                    _progressBar.setVisibility(ProgressBar.VISIBLE);
                     progressBarIsShowing = true;
                     retrofit_response(default_latitude + "," + default_longitude);
-                }
 
-                resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-                resRecyclerView.setHasFixedSize(true);
+                    resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+                    resRecyclerView.setHasFixedSize(true);
 
-                resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-                resRecyclerView.setLayoutManager(resLayoutManager);
+                    resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+                    resRecyclerView.setLayoutManager(resLayoutManager);
 
-                resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
-                resRecyclerView.setAdapter(resDataAdapter);
+                    resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
+                    resRecyclerView.setAdapter(resDataAdapter);
 
-                resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener() {
+                    resDataAdapter.setOnItemClickListener(new ResDataAdapter.OnItemClickListener() {
 
-                    @Override
-                    public void onItemClick(View itemView, int position) {
+                        @Override
+                        public void onItemClick(View itemView, int position) {
 
 //                Toast.makeText(MainActivity.this, "Res card clicked", Toast.LENGTH_SHORT).show();
 
-                        Results res_results_card = resJSONdata.get(position);
+                            Results res_results_card = resJSONdata.get(position);
 
-                        ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
+                            ArrayList<Photos> res_photos = resJSONdata.get(position).getPhotos();
 
-                        Intent i = new Intent(MainActivity.this, DetailActivity.class);
-                        i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
+                            Intent i = new Intent(MainActivity.this, DetailActivity.class);
+                            i.putExtra(DetailActivity.PLACE_ID, res_results_card.getPlaceId());
 
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            Bundle bundle = ActivityOptionsCompat
-                                    .makeSceneTransitionAnimation(MainActivity.this)
-                                    .toBundle();
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                Bundle bundle = ActivityOptionsCompat
+                                        .makeSceneTransitionAnimation(MainActivity.this)
+                                        .toBundle();
 
-                            startActivity(i, bundle);
-                        } else {
-                            startActivity(i);
+                                startActivity(i, bundle);
+                            } else {
+                                startActivity(i);
+                            }
+
                         }
-
-                    }
-                });
+                    });
+                }
             }
-        } catch (SecurityException e) {
+
+        }catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
-
-    }
-
-    @Override
-    public void onPlaceSelected(Place place) {
-
-//        Log.i(LOG_TAG, "Place Selected: " + place.getName());
-
-        loc = place.getName().toString();
-
-        LocTextView.setText(place.getName());
-        LatLng Sel_location = place.getLatLng();
-
-        current_loc = false;
-        progress_bar.setVisibility(ProgressBar.VISIBLE);
-        progressBarIsShowing = true;
-        retrofit_response(Sel_location.latitude + "," + Sel_location.longitude);
-    }
-
-    @Override
-    public void onError(Status status) {
-
-        Log.e(LOG_TAG, "onError: Status = " + status.toString());
-        Toast.makeText(this, R.string.loc_sel_failed + status.getStatusMessage(),
-                Toast.LENGTH_SHORT).show();
-
     }
 
     /**
@@ -415,24 +673,6 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
         super.onSaveInstanceState(outState);
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-//
-//        Log.d(LOG_TAG, "onStart");
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-//        Log.d(LOG_TAG, "on resume");
-
-        if (current_loc == false)
-            LocTextView.setText(loc);
     }
 
     @Override
@@ -526,7 +766,7 @@ public class MainActivity extends AppCompatActivity implements PlaceSelectionLis
 
                 }
 
-                progress_bar.setVisibility(ProgressBar.INVISIBLE);
+                _progressBar.setVisibility(ProgressBar.INVISIBLE);
 
                 resDataAdapter = new ResDataAdapter(getBaseContext(), resJSONdata);
                 resRecyclerView.setAdapter(resDataAdapter);

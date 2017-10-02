@@ -77,5 +77,11 @@
     <string name="Aname_notfound">Author Name Not Found</string>
     <string name="review_notfound">Review Text Not Found</string>
 
+    <string name="not_connected">Not Connected!</string>
+    <string name="Location_Updated">Location Updated</string>
+    <string name="Connection_Suspended">Connection Suspended!</string>
+    <string name="Connection_Failed">Connection Failed!</string>
+    <string name="loc_not_enabled">Location Service not Enabled</string>
+
 
 </resources>

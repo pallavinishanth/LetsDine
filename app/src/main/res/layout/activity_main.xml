@@ -40,12 +40,23 @@
                 android:focusableInTouchMode="true"
                 android:contentDescription="@string/ChangeLocation" />
 
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:id="@+id/currentloc_icon"
+                android:src="@drawable/currentloc"
+                android:layout_toRightOf="@id/location"
+                android:layout_centerInParent="true"
+                android:clickable="true"/>
+
             <ProgressBar
                 android:id="@+id/progressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/location"
-                android:visibility="invisible" />
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_toRightOf="@id/currentloc_icon"
+                android:visibility="invisible"
+                android:layout_centerInParent="true"
+                android:layout_margin="10dp"/>
 
         </RelativeLayout>
 
