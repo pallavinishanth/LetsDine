@@ -4,7 +4,7 @@
     <!-- main activity -->
     <dimen name="location_padding">8dp</dimen>
     <dimen name="location_margin">8dp</dimen>
-    <dimen name="location_textsize">16sp</dimen>
+    <dimen name="location_textsize">18sp</dimen>
 
     <dimen name="corner_width">2dp</dimen>
 

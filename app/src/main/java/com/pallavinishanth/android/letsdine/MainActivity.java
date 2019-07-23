@@ -86,8 +86,8 @@ public class MainActivity extends AppCompatActivity implements
     public static double latitude;
     public static double longitude;
     TextView LocTextView;
-    String cityname;
-    ImageView currloc;
+    String cityName;
+    ImageView currLoc;
     private Toolbar mToolbar;
     private RecyclerView resRecyclerView;
     private RecyclerView.LayoutManager resLayoutManager;
@@ -115,17 +115,19 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(true);
+        //actionBar.setIcon(R.mipmap.ic_launcher);
+        //actionBar.setDisplayUseLogoEnabled(true);
 
-        LocTextView = (TextView) findViewById(R.id.location);
-        currloc = (ImageView) findViewById(R.id.currentloc_icon);
+        LocTextView = findViewById(R.id.location);
+       // currLoc = findViewById(R.id.currentloc_icon);
 
-        _progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        mCLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
+        _progressBar = findViewById(R.id.progressBar);
+        //mSwipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+        mCLayout = findViewById(R.id.coordinator_layout);
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -143,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements
 //            Log.d(LOG_TAG, "After rotating" + LocTextView.getText().toString());
 //            Log.d(LOG_TAG, "After rotating" + resJSONdata.get(1).getName().toString());
 
-            resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+            resRecyclerView = findViewById(R.id.recycler_view);
             resRecyclerView.setHasFixedSize(true);
 
             resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -188,21 +190,21 @@ public class MainActivity extends AppCompatActivity implements
 
         }
 
-        currloc.setOnClickListener(new View.OnClickListener(){
-
-            @Override
-            public void onClick(View view) {
-
-//                Log.v(LOG_TAG, "current location clicked..........");
-                Toast.makeText(MainActivity.this, "Location Updated", Toast.LENGTH_SHORT).show();
-                current_loc = true;
-
-                if (mGoogleApiClient != null)
-                    mGoogleApiClient.connect();
-
-//                getLocation();
-            }
-        });
+//        currLoc.setOnClickListener(new View.OnClickListener(){
+//
+//            @Override
+//            public void onClick(View view) {
+//
+////                Log.v(LOG_TAG, "current location clicked..........");
+//                Toast.makeText(MainActivity.this, "Location Updated", Toast.LENGTH_SHORT).show();
+//                current_loc = true;
+//
+//                if (mGoogleApiClient != null)
+//                    mGoogleApiClient.connect();
+//
+////                getLocation();
+//            }
+//        });
 
         LocTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -232,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements
     /*Ending the updates for the location service*/
     @Override
     protected void onStop() {
-        mGoogleApiClient.disconnect();
+            mGoogleApiClient.disconnect();
         super.onStop();
     }
 
@@ -451,9 +453,9 @@ public class MainActivity extends AppCompatActivity implements
             try {
                 addresses = gcd.getFromLocation(latitude, longitude, 1);
                 if (addresses.size() > 0) {
-                    cityname = addresses.get(0).getLocality().toString();
+                    cityName = addresses.get(0).getLocality().toString();
 
-                    LocTextView.setText(cityname);
+                    LocTextView.setText(cityName);
                 }
 
             } catch (IOException e) {
@@ -464,7 +466,7 @@ public class MainActivity extends AppCompatActivity implements
             progressBarIsShowing = true;
             retrofit_response(latitude + "," + longitude);
 
-            resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+            resRecyclerView = findViewById(R.id.recycler_view);
             resRecyclerView.setHasFixedSize(true);
 
             resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -509,7 +511,7 @@ public class MainActivity extends AppCompatActivity implements
 
         try{
             if (mLocationPermissionGranted) {
-                /*Getting the location after aquiring location service*/
+                /*Getting the location after acquiring location service*/
                 mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                         mGoogleApiClient);
 
@@ -527,8 +529,8 @@ public class MainActivity extends AppCompatActivity implements
                         try {
                             addresses = gcd.getFromLocation(latitude, longitude, 1);
                             if (addresses.size() > 0) {
-                                cityname = addresses.get(0).getLocality().toString();
-                                LocTextView.setText(cityname);
+                                cityName = addresses.get(0).getLocality().toString();
+                                LocTextView.setText(cityName);
                             }
 
                         } catch (IOException e) {
@@ -540,7 +542,7 @@ public class MainActivity extends AppCompatActivity implements
                         progressBarIsShowing = true;
                         retrofit_response(latitude + "," + longitude);
 
-                        resRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+                        resRecyclerView = findViewById(R.id.recycler_view);
                         resRecyclerView.setHasFixedSize(true);
 
                         resLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -577,7 +579,7 @@ public class MainActivity extends AppCompatActivity implements
                         });
                     }
                 } else {
-                /*if there is no last known location. Which means the device has no data for the loction currently.
+                /*if there is no last known location. Which means the device has no data for the location currently.
                 * So we will get the current location.
                 * For this we'll implement Location Listener and override onLocationChanged*/
                     Log.i("Current Location", "No data for location found");
@@ -598,11 +600,11 @@ public class MainActivity extends AppCompatActivity implements
                     try {
                         addresses = gcd.getFromLocation(default_latitude, default_longitude, 1);
                         if (addresses.size() > 0) {
-                            cityname = addresses.get(0).getLocality().toString();
+                            cityName = addresses.get(0).getLocality().toString();
                             //state = addresses.get(0).getAdminArea().toString();
 
 //                        Log.d(LOG_TAG, "After back button pressed");
-                            LocTextView.setText(cityname);
+                            LocTextView.setText(cityName);
                         }
 
                     } catch (IOException e) {

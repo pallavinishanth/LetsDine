@@ -16,47 +16,61 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:layout_scrollFlags="scroll|enterAlways" />
+            android:layout_height="40dp"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/location"
-                tools:text="@string/location_placeholder"
-                android:background="@drawable/corner_round"
-                android:textSize="@dimen/location_textsize"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:padding="@dimen/location_padding"
-                android:layout_margin="@dimen/location_margin"
-                android:textAlignment="center"
-                android:layout_centerInParent="true"
-                android:focusableInTouchMode="true"
-                android:contentDescription="@string/ChangeLocation" />
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/location_margin">
 
             <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:id="@+id/currentloc_icon"
-                android:src="@drawable/currentloc"
-                android:layout_toRightOf="@id/location"
-                android:layout_centerInParent="true"
-                android:clickable="true"/>
+                android:id="@+id/place_marker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/place_marker"
+                android:padding="@dimen/location_padding"
+                android:contentDescription="@string/place_marker" />
+
+            <TextView
+                android:id="@+id/location"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/place_marker"
+                android:contentDescription="@string/ChangeLocation"
+                android:focusableInTouchMode="true"
+                android:padding="@dimen/location_padding"
+                android:textAlignment="viewStart"
+                android:textColor="@color/white"
+                android:textSize="@dimen/location_textsize"
+                android:textStyle="normal"
+                tools:text="@string/location_placeholder"
+                android:background="@drawable/corner_round" />
+
+            <!--<ImageView-->
+            <!--android:layout_width="40dp"-->
+            <!--android:layout_height="40dp"-->
+            <!--android:id="@+id/currentloc_icon"-->
+            <!--android:src="@drawable/currentloc"-->
+            <!--android:layout_toRightOf="@id/location"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--android:clickable="true"/>-->
 
             <ProgressBar
                 android:id="@+id/progressBar"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_toRightOf="@id/currentloc_icon"
-                android:visibility="invisible"
-                android:layout_centerInParent="true"
-                android:layout_margin="10dp"/>
+                android:layout_width="19dp"
+                android:layout_height="23dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:visibility="invisible" />
+            <!--android:layout_toRightOf="@id/currentloc_icon"-->
+
 
         </RelativeLayout>
 
@@ -70,11 +84,11 @@
         android:background="@color/grey_300"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_refresh_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal">
+        <!--<android.support.v4.widget.SwipeRefreshLayout-->
+            <!--android:id="@+id/swipe_refresh_layout"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_gravity="center_horizontal">-->
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view"
@@ -87,7 +101,7 @@
                 android:paddingRight="@dimen/list_side_margin"
                 android:paddingBottom="@dimen/list_side_margin"
                 android:contentDescription="@string/Restaurant_List" />
-        </android.support.v4.widget.SwipeRefreshLayout>
+        <!--</android.support.v4.widget.SwipeRefreshLayout>-->
 
     </FrameLayout>
 

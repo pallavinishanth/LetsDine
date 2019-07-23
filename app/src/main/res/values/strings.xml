@@ -82,6 +82,7 @@
     <string name="Connection_Suspended">Connection Suspended!</string>
     <string name="Connection_Failed">Connection Failed!</string>
     <string name="loc_not_enabled">Location Service not Enabled</string>
+    <string name="place_marker">Place search marker</string>
 
 
 </resources>
